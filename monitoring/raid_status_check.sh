@@ -103,16 +103,16 @@ done
 
 function get_user_passwd() {
     if [[ ${FUEL_HOST} == "lab" ]]; then
-        local user=johndoe
-        local passwd=SeaR\$Aadmin
+        local user=<REDACTED>
+        local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     elif [[ ${FUEL_HOST} == "ash" ]]; then
-        local user=root
-        local passwd=calvin
+        local user=<REDACTED>
+        local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     elif [[ ${FUEL_HOST} == "sea" ]]; then
-        local user=johndoe
-        local passwd=SeaR\$Aadmin
+        local user=<REDACTED>
+        local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     fi
 }
@@ -153,11 +153,13 @@ function get_state() {
 }
 
 function get_compute_idrac_ips() {
-    elif [[ ${FUEL_HOST} == "dfw" ]]; then
-        local compute_nodes_domains=($(${FUEL} node list|grep compute|awk '{printf "r-%s ",$5}'))
+    if [[ ${FUEL_HOST} == "lab" ]]; then
+        local compute_idrac_ips=(10.1.1.10 10.1.1.11 10.1.1.12)
+    elif [[ ${FUEL_HOST} == "ash" ]]; then
+        local compute_nodes_domains=($(${FUEL} node list|awk '/compute/{printf "r-%s ",$5}'))
         local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; do host $i|awk '{print $4}'; done))
-    elif [[ ${FUEL_HOST} == "ord" ]]; then
-        local compute_nodes_domains=($(${FUEL} node list|grep compute|awk '{printf "r-%s ",$5}'))
+    elif [[ ${FUEL_HOST} == "sea" ]]; then
+        local compute_nodes_domains=($(${FUEL} node list|awk '/compute/{printf "r-%s ",$5}'))
         local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; do host $i|awk '{print $4}'; done))
     fi
     echo ${compute_idrac_ips[@]}

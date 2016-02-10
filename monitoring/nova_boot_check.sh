@@ -35,6 +35,8 @@ fi
 PING=$(which ping)
 GREP=$(which grep)
 SSH=$(which ssh)
+NOVA=$(which nova)
+NEUTRON=$(which neutron)
 SENSU_SSH_KEY=/etc/sensu/plugins/sensu-key
 PACKET_LOSS=20 # ping packet loss threshold to trigger alert
 
@@ -51,15 +53,6 @@ function print_val {
   fi
 }
 
-function ping_ip {
-    local ip="$1"
-    if [[ ${ip} =~ ^10\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3} ]]; then 
-        echo $(${PING} -c 3 -W 2 -q ${ip} | ${GREP} -oP '\d+(?=% packet loss)')
-    else
-        echo "ERROR"
-    fi
-}
-
 # Main #########################################################################
 
 # Verbosity level
@@ -72,33 +65,33 @@ function nova_boot() {
     local compute_node="$2"
     local instance_name="$3"
     local msg=""
-    local result=""
+    local result="X:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
     # Capture "node-XX" part
     local node=$(sed -e 's/.*\(node-[0-9]\+\)/\1/g' <<< "${instance_name}")
 
-: <<'END'
-END
     # Start building instance
-    nova --os-tenant-name ${OS_TENANT_NAME} boot --flavor ${NOVA_FLAVOR} \
-         --image ${NOVA_IMAGE} --security-groups ${NOVA_SECGROUP} \
-         --nic net-id=${EXT_NET_ID} --key-name ${NOVA_KEYNAME} \
-         --availability-zone ${az}:${compute_node} \
-         ${instance_name} > /dev/null 2>&1
+    ${NOVA} --os-tenant-name ${OS_TENANT_NAME} boot --flavor ${NOVA_FLAVOR} \
+            --image ${NOVA_IMAGE} --security-groups ${NOVA_SECGROUP} \
+            --nic net-id=${EXT_NET_ID} --key-name ${NOVA_KEYNAME} \
+            --availability-zone ${az}:${compute_node} \
+            ${instance_name} > /dev/null 2>&1
 
     sleep 2
 
     # Get initial state of build
-    VM_INFO=$(nova --os-tenant-name ${OS_TENANT_NAME} list | \
+    VM_INFO=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} list | \
         awk -v regex="${instance_name}" '$4 ~ regex {printf "%s;%s;%s",$2,$6,$10}')
     VM_UUID=$(echo ${VM_INFO}|awk -F';' '{print $1}')
     VM_STATUS=$(echo ${VM_INFO}|awk -F';' '{print tolower($2)}')
     VM_POWER_STATE=$(echo ${VM_INFO}|awk -F';' '{print tolower($3)}')
 
+    result="WAIT:${VM_UUID}"
+
     # Keep checking state until success or failure
     TIME_START=$(date +%s)
     until [[ ${VM_STATUS} == "active" && ${VM_POWER_STATE} == "running" ]]; do
-        VM_INFO=$(nova --os-tenant-name ${OS_TENANT_NAME} list | \
+        VM_INFO=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} list | \
             awk -v regex="${instance_name}" '$4 ~ regex {printf "%s;%s;%s",$2,$6,$10}')
         VM_STATUS=$(echo ${VM_INFO}|awk -F';' '{print tolower($2)}')
         VM_POWER_STATE=$(echo ${VM_INFO}|awk -F';' '{print tolower($3)}')
@@ -113,7 +106,7 @@ END
             #msg+="${NOVA_BUILD_TIMEOUT} seconds"
             #delete_instance ${VM_UUID} ${instance_name}
             #exit $STATE_CRITICAL
-            echo "CRITICAL:${VM_UUID}"
+            result="CRITICAL:${VM_UUID}"
             break
         fi
         if [[ ${VM_STATUS} == "error" ]]; then
@@ -122,73 +115,27 @@ END
             #msg+=seconds"
             #delete_instance ${VM_UUID} ${instance_name}
             #exit $STATE_CRITICAL
-            echo "CRITICAL:${VM_UUID}"
+            result="CRITICAL:${VM_UUID}"
             break
         fi
     done
 
     # Instance should now be ACTIVE, so return results
-    echo "OK:${VM_UUID}"
-}
-
-function get_public_ip() {
-    # Returns the instances external net IP. Should be a 10. address
-    local vm_uuid="$1"
-    echo $(nova --os-tenant-name ${OS_TENANT_NAME} show ${VM_UUID} | \
-           awk -v regex="${EXT_NET_NAME}" '$2 ~ regex {print $5}')
-}
-
-function ping_check() {
-    # See if we can ping instance's public IP
-    local ip="$1"
-    local instance_name="$2"
-    local node=$(sed -e 's/.*\(node-[0-9]\+\)/\1/g' <<< "${instance_name}")
-
-    PING_RESULT=$(ping_ip ${ip})
-    if [[ ${PING_RESULT} != "ERROR" ]]; then
-        if [[ ${PING_RESULT} < ${PACKET_LOSS} ]]; then
-            print_val "DEBUG: pinging ${instance_name} with ${PING_RESULT}% packet loss"
-            alert_array["ping"]+="${node}:${STATE_OK};"
-        else
-            print_val "DEBUG: WARNING: pinging ${instance_name} with ${PING_RESULT}% packet loss"
-            alert_array["ping"]+="${node}:${STATE_WARNING};"
-        fi
-    else
-        echo "${ALERT_NAME} WARNING: [PING_RESULT: ${instance_name} unknown result];"
-        exit $STATE_WARNING
-    fi
-}
-
-function ssh_check() {
-    # See if we can SSH into newly created instance
-    local ip="$1"
-    local instance_name="$2"
-    local node=$(sed -e 's/.*\(node-[0-9]\+\)/\1/g' <<< "${instance_name}")
-    UPTIME_RESULT=$(${SSH} -q -i ${SENSU_SSH_KEY} \
-                    -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null \
-                    cirros@${ip} uptime 2>/dev/null | \
-                    awk '$0 ~ /load/ {print $7}')
-    #if [[ ! -z ${UPTIME_RESULT} ]]; then
-    if [[ ${UPTIME_RESULT} == "load" ]]; then
-        print_val "DEBUG: Able to SSH into ${instance_name}"
-        alert_array["ssh"]+="${node}:${STATE_OK};"
-    else
-        print_val "DEBUG: WARNING: Not able to SSH into ${instance_name}"
-        alert_array["ssh"]+="${node}:${STATE_WARNING};"
-    fi
+    result="OK:${VM_UUID}"
+    echo ${result}
 }
 
 function delete_instance() {
     local vm_uuid="$1"
     local instance_name="$2"
     local node=$(sed -e 's/.*\(node-[0-9]\+\)/\1/g' <<< "${instance_name}")
-    DELETE_REQUEST=$(nova --os-tenant-name ${OS_TENANT_NAME} delete ${vm_uuid} 2>/dev/null | \
+    DELETE_REQUEST=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} delete ${vm_uuid} 2>/dev/null | \
                      awk '/accepted/{print "SUCCESS"}')
     sleep 10 # Give delete process time to complete
-    IS_DELETED_A=$(nova --os-tenant-name ${OS_TENANT_NAME} show ${vm_uuid} 2>&1 | \
+    IS_DELETED_A=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} show ${vm_uuid} 2>&1 | \
                    awk '/No server with/{print "YES"}')
     sleep 5 # Make sure instance has really been deleted
-    IS_DELETED_B=$(nova --os-tenant-name ${OS_TENANT_NAME} delete ${vm_uuid} 2>&1 | \
+    IS_DELETED_B=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} delete ${vm_uuid} 2>&1 | \
                    awk '/No server with/{print "YES"}')
     if [[ ${DELETE_REQUEST} == "SUCCESS" && \
           ${IS_DELETED_A} == "YES" && ${IS_DELETED_B} == "YES" ]]; then
@@ -198,6 +145,31 @@ function delete_instance() {
         print_val "DEBUG: WARNING: ${instance_name} might not have deleted successfully"
         alert_array["delete"]+="${node}:${STATE_WARNING};"
     fi
+}
+
+function cleanup_failed_deleted_instances() {
+    # This function checks if there are any sensu-nova-boot-check instances
+    # that failed to delete in the previous run of the check. If it finds
+    # any instances that match the check and are over 1 hour old, it will
+    # try to delete them.
+    fields="name,created"
+    instance_array=($(${NOVA} --os-tenant-name ${OS_TENANT_NAME} list --fields ${fields} | \
+        awk -W posix -F'|' '$2 ~ /[[:alnum:]-]{36}/{
+        gsub(" |\t","");printf "%s;%s;%s\n",$2,$3,$4}'))
+
+    for instance_data in ${instance_array[@]}; do
+        uuid=$(echo ${instance_data} | cut -d';' -f1)
+        vm_name=$(echo ${instance_data} | cut -d';' -f2)
+        created=$(echo ${instance_data} | cut -d';' -f3 | \
+            awk '{gsub("T"," ");gsub("Z","");print $0}')
+        let DELTA=($(date -u '+%s')-$(date -d "${created}" '+%s'))
+        match=$(awk -vsensu=${INSTANCE_NAME_PREFIX} \
+            '/sensu/{print substr($0,0,21)}' <<< "${vm_name}")
+        if [[ "${match}" == "${INSTANCE_NAME_PREFIX}" ]] && \
+           [[ ${DELTA} -gt 3600 ]]; then
+            delete_instance ${uuid} ${vm_name}
+        fi
+    done
 }
 
 # We generate an array of controller hostnames, pick a random one from the list
@@ -212,14 +184,15 @@ else
     echo "${ALERT_NAME} OK: Check running on other controller node (${RANDOM_CONTROLLER})"
     exit $STATE_OK
 fi
-CONTROLLER="node-10"
+
+cleanup_failed_deleted_instances
 
 #== Begin the Nova boot check process =========================================
 
 print_val "DEBUG: Retrieving external-network name..."
 #EXT_NET_NAME=$(neutron net-external-list |\
 #               awk -W posix -F'|' '$2 ~ /[[:alnum:]-]{36}/{gsub(" ","");print $3}')
-EXT_NET_NAME=$(nova floating-ip-list|awk '$2 ~ /^10\./{print $8}'|head -1)
+EXT_NET_NAME=$(${NOVA} floating-ip-list|awk '$2 ~ /^10\./{print $8;exit}')
 if [[ -z ${EXT_NET_NAME} ]]; then
     echo "${ALERT_NAME} CRITICAL: Could not retrieve external-network name"
     exit $STATE_CRITICAL
@@ -228,7 +201,8 @@ fi
 # Needs to be able to handle names like "ext_net05-10.211.128.0/18"
 print_val "DEBUG: Retrieving external-network UUID..."
 #EXT_NET_ID=$(neutron net-list -- --name ${EXT_NET_NAME} --fields id)
-EXT_NET_ID=$(neutron net-list | awk -v regex="${EXT_NET_NAME}" '$4 ~ regex {print $2}')
+EXT_NET_ID=$(${NEUTRON} net-list |\
+    awk -v regex="${EXT_NET_NAME}" '$4 ~ regex {print $2}')
 if [[ -z ${EXT_NET_ID} ]]; then
     echo "${ALERT_NAME} CRITICAL: Could not retrieve external-network UUID"
     exit $STATE_CRITICAL
@@ -237,7 +211,7 @@ fi
 # Create an array of compute nodes for "az1"/"az2" availability zones
 print_val "DEBUG: Getting a list of availability zones and associated compute nodes..."
 ZONE_NAMES=( 'az1' 'az2' )
-AZ_NODES=$(nova --os-tenant-name ${OS_TENANT_NAME} availability-zone-list)
+AZ_NODES=$(${NOVA} --os-tenant-name ${OS_TENANT_NAME} availability-zone-list)
 AZ1_NODES=($(awk '/az1/,/^+/{if ($3 ~ /node/){print $3}}' <<< "${AZ_NODES}"))
 AZ2_NODES=($(awk '/az2/,/az1/{if ($3 ~ /node/){print $3}}' <<< "${AZ_NODES}"))
 
@@ -288,10 +262,15 @@ done
 declare -A boot_arr ping_arr ssh_arr delete_arr
 is_critical=0
 is_warning=0
+re='^[0-9]$'
 
 # Parse boot alerts
 OLDIFS=$IFS; IFS=';' read -r -a bootvals <<< "${alert_array['boot']}"; IFS=$OLDIFS
 for i in "${bootvals[@]}"; do
+    if ! [[ ${i#*:} =~ $re ]]; then
+        echo "${ALERT_NAME} UNKNOWN: Expecting integer value. Got \"${i}\" instead."
+        exit ${STATE_UNKNOWN}
+    fi
     if [[ "${i#*:}" -eq "1" ]]; then
         boot_arr["warning"]+="${i%%:*},"
         is_warning=1
@@ -306,6 +285,10 @@ done
 # Parse delete alerts
 OLDIFS=$IFS; IFS=';' read -r -a deletevals <<< "${alert_array['delete']}"; IFS=$OLDIFS
 for i in "${deletevals[@]}"; do
+    if ! [[ ${i#*:} =~ $re ]]; then
+        echo "${ALERT_NAME} UNKNOWN: Expecting integer value. Got \"${i}\" instead."
+        exit ${STATE_UNKNOWN}
+    fi
     if [[ "${i#*:}" -eq "1" ]]; then
         delete_arr["warning"]+="${i%%:*},"
         is_warning=1
