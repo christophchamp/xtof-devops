@@ -124,14 +124,13 @@ fi
 ## we will warn on any of the following being non-0
 ##	0 Bytes degraded-healthy capacity
 ##	0 Bytes unreachable-unused capacity
-##	0 Bytes rebalance capacity
 ##	0 Bytes fwd-rebuild capacity
 ##	0 Bytes bck-rebuild capacity
 
 print_val "looking for warnings..."
 
 warn=$(echo "$raw" | grep -E "degraded-healthy capacity|unreachable-unused capacity|\
-rebalance capacity|fwd-rebuild capacity|bck-rebuild capacity")
+fwd-rebuild capacity|bck-rebuild capacity")
 
 for w in $warn; do
   print_val "$w"

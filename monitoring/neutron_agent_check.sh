@@ -43,10 +43,8 @@ for agent in ${agents_status[@]}; do
 done
 
 # Exit status with message
-msg=""
 if [[ ${#alert_array["critical"]} -gt 0 ]]; then
-    msg="${ALERT_NAME} CRITICAL: The following Neutron agents are down: "
-    msg+="{${alert_array["critical"]}}"
+    echo "${ALERT_NAME} CRITICAL: The following Neutron agents are down: {${alert_array["critical"]}}"
     exit $STATE_CRITICAL
 else
     echo "${ALERT_NAME} OK: All Neutron agents are up: {${alert_array["ok"]}}"

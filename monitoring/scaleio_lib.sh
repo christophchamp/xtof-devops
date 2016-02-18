@@ -1,7 +1,7 @@
 PROGNAME=`/bin/basename $0`
 
-SCALEIO_USER=
-SCALEIO_PW=
+SCALEIO_USER=admin
+SCALEIO_PW=<REDACTED>
 SCLI=/bin/scli
 
 # Exit codes

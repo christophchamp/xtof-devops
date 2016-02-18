@@ -89,7 +89,7 @@ function ping_floating_ip {
     local floating_ip="$1"
     local vm_state="$2"
     local instance_status="$3"
-    local security_groups=$(echo $4|grep -c "My-default")
+    local security_groups=$(echo $4|grep -c "default")
     if [[ ${floating_ip} =~ ^10\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3} ]] && 
        [[ ${vm_state} == "active" ]] && 
        [[ ${instance_status} == "ACTIVE" ]] && 
@@ -142,7 +142,7 @@ fi
 #raw=$(${NOVA} list --all-tenants --fields ${fields} | awk -W posix -F'|' '
 #      $2 ~ /[[:alnum:]-]{36}/{
 #        nets=match($5, /, 10\.*/);tendot=substr($5,nets+2);
-#        gsub(", ",";",$6);secgrp=match($6,/My-default/);
+#        gsub(", ",";",$6);secgrp=match($6,/default/);
 #        if(tendot ~ /10\./ && secgrp>0){
 #          gsub(" ","",$2);gsub(" ","",$3);gsub(" ","",$4);gsub(" ","",tendot);
 #          gsub(" ","",$6);printf "%s,%s,%s,%s,%s\n", $2,$3,$4,tendot,$6}}')
