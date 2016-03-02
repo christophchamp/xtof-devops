@@ -27,9 +27,7 @@ function print_val {
 }
 
 function find_primary_mdm {
-  controller_node_ids=$(fuel node | grep controller)
-
-  for id in $controller_node_ids; do
+  for id in $(fuel node | awk '/controller/{print $1}'); do
     node_name=node-$id
 
     raw=$(ssh -q $node_name $SCLI --login --username $SCALEIO_USER --password $SCALEIO_PW 2>&1)

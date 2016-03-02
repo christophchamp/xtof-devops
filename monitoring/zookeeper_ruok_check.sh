@@ -9,7 +9,6 @@
 #+ If it does not respond at all, it will exit with STATE_CRITICAL.
 # NOTE: This script assumes ZooKeeper in listening on ZOOKEEPER_PORT.
 
-set -e
 ALERT_NAME="CheckZooKeeperRuok"
 PROGNAME=$(`which basename` $0)
 VERSION="Version 1.0"

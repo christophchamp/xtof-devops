@@ -4,7 +4,6 @@
 # Sensu plugin to check if all Neutron agents are up                           #
 ################################################################################
 
-set -e
 ALERT_NAME="NeutronAgentCheck"
 PROGNAME=$(`which basename` $0)
 VERSION="Version 1.0"

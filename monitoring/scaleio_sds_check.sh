@@ -74,13 +74,12 @@ done
 
 find_primary_mdm
 
-IFS="
-"
+IFS=$'\n'
 raw=$(ssh -q $PRIMARY_MDM $SCLI --query_all_sds | tail -n +4)
 
 for sds in $raw; do
-  sds_state=$(echo $sds | awk '{printf "%s %s", $7, $8}')
-  node=$(echo $sds | awk '{printf "%s", $5}')
+  sds_state=$(echo $sds | awk '{printf "%s %s",$7,$8}')
+  node=$(echo $sds | awk '{printf "%s",$5}')
   print_val "$node SDS State: $sds_state"
  
   if [[ $sds_state != "Connected, Joined" ]]; then
@@ -89,9 +88,7 @@ for sds in $raw; do
   fi
 done
 
-IFS="
-"
-
+IFS=$'\n'
 raw=$(ssh -q $PRIMARY_MDM $SCLI --query_all)
 
 ## first look for critical items, we'll do warning later...
@@ -103,7 +100,8 @@ raw=$(ssh -q $PRIMARY_MDM $SCLI --query_all)
 ## 0 Bytes degraded-failed capacity
 ## 0 Bytes decreased capacity
 
-failed=$(echo "$raw" | grep -E "failed capacity|degraded-failed capacity|decreased capacity")
+failed=$(echo "$raw" | grep -E "failed capacity|degraded-failed capacity|\
+decreased capacity")
 msg=""
 print_val "Looking for failures..." 
 
@@ -129,8 +127,8 @@ fi
 
 print_val "looking for warnings..."
 
-warn=$(echo "$raw" | grep -E "degraded-healthy capacity|unreachable-unused capacity|\
-fwd-rebuild capacity|bck-rebuild capacity")
+warn=$(echo "$raw" | grep -E "degraded-healthy capacity|\
+unreachable-unused capacity|fwd-rebuild capacity|bck-rebuild capacity")
 
 for w in $warn; do
   print_val "$w"

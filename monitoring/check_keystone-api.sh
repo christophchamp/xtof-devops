@@ -24,7 +24,6 @@
 #
 
 # #RED
-set -e
 
 ALERT_NAME="CheckKeystoneAPI"
 

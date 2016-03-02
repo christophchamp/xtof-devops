@@ -11,7 +11,6 @@
 #+ If, at any step along the process, something fails, it will alert which
 #+ process(es) failed on which compute node and from which conductor node.
 
-set -e
 ALERT_NAME="CheckNovaBoot"
 PROGNAME=$(`which basename` $0)
 VERSION="Version 1.2"

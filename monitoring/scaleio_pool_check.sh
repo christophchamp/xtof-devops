@@ -129,12 +129,10 @@ declare -A tvols
 declare -A tavail
 
 function parse_storage_pools() {
-IFS="
-"
     local raw=$(ssh -q $PRIMARY_MDM $SCLI --query_all)
-    local spools=$(awk '/^Storage Pool/{
+    local spools=$(IFS=$'\n'; awk '/^Storage Pool/{
                         if($3 ~ /default/){} # skip default storage pool
-                        else{gsub("\\(","");gsub("\\)","");if($13=="GB"){
+                        else{gsub(/\(|\)/,"");;if($13=="GB"){
                         printf "%s;%s|%s\n", $3,$7,$12}}}' <<< "${raw}")
 
     for pool in $spools; do
@@ -168,14 +166,12 @@ for K in "${!wthreshholds[@]}"; do
     fi
 done
 
-msg=": "
-
 for K in "${!wthreshholds[@]}"; do
     nvol=${tvols[$K]}
     avail=${tavail[$K]}
     msg+="Pool $K $nvol vols $avail GB available; "
 done
 
-echo "${ALERT_NAME} OK"
+echo "${ALERT_NAME} OK: ${msg%; }"
 print_val $msg
 exit $STATE_OK

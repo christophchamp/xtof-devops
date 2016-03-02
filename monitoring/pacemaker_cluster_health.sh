@@ -67,7 +67,7 @@ do
 done
 
 raw=$(${CRM_MON} -1n|awk '/^Node/,/^$/{if($1=="Node"){
-    gsub("(.example.com:|.example.local:)","",$2);printf "%s:%s\n",$2,$3}}')
+    gsub(/\.(example.com|example.local):/,"");printf "%s:%s\n",$2,$3}}')
 
 OLDIFS=$IFS; IFS=$'\n' read -d '' -r -a nodes <<< "${raw}"; IFS=$OLDIFS
 alert_json="{\"failed_nodes\":["
@@ -86,7 +86,7 @@ alert_msg="${n}/${#nodes[@]} nodes offline; "
 raw=$(${CRM_MON} -1n|awk '/^Node/,/^$/{if($1!="Node" && $1 ~ /[a-z_-]/){
     printf "%s:%s\n",$1,$3}}')
 OLDIFS=$IFS; IFS=$'\n' read -d '' -r -a resources <<< "${raw}"; IFS=$OLDIFS
-regex="(Started|Master)"
+regex="(Started|Master|Slave)"
 alert_json+="\"failed_resources\":["
 failed_resources=0
 n=0

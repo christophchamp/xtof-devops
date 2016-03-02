@@ -103,15 +103,15 @@ done
 
 function get_user_passwd() {
     if [[ ${FUEL_HOST} == "lab" ]]; then
-        local user=<REDACTED>
+        local user=root
         local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     elif [[ ${FUEL_HOST} == "ash" ]]; then
-        local user=<REDACTED>
+        local user=root
         local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     elif [[ ${FUEL_HOST} == "sea" ]]; then
-        local user=<REDACTED>
+        local user=root
         local passwd=<REDACTED>
         printf "%s;%s" ${user} ${passwd}
     fi
@@ -154,7 +154,7 @@ function get_state() {
 
 function get_compute_idrac_ips() {
     if [[ ${FUEL_HOST} == "lab" ]]; then
-        local compute_idrac_ips=(10.1.1.10 10.1.1.11 10.1.1.12)
+        local compute_idrac_ips=(10.192.168.101 10.192.168.102 10.192.168.103)
     elif [[ ${FUEL_HOST} == "ash" ]]; then
         local compute_nodes_domains=($(${FUEL} node list|awk '/compute/{printf "r-%s ",$5}'))
         local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; do host $i|awk '{print $4}'; done))
