@@ -1,0 +1,178 @@
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
+    [ -e "$DIR_COLORS" ] || DIR_COLORS=""
+    eval "`dircolors -b $DIR_COLORS`"
+    alias ls='ls --color=auto'
+fi
+
+test -s ~/.alias && . ~/.alias || true
+
+## Christoph Champ's additions
+
+# Do not put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=ignoredups
+# ... and ignore same sucessive entries.
+export HISTCONTROL=ignoreboth
+export HISTSIZE=1000000
+export HISTFILESIZE=1000000
+export HISTTIMEFORMAT='%F %T ' # add timestamp to history
+alias h1='history 10'
+alias h2='history 20'
+alias h3='history 30'
+shopt -s histappend
+
+export PATH=/home/champ/bin:$PATH
+export VISUAL=vim
+export EDITOR=/usr/bin/vim
+export GIT_EDITOR=/usr/bin/vim
+export SVN_EDITOR=/usr/bin/vim
+export PYTHONWARNINGS="default"
+export MTR_OPTIONS=-t  # force ncurses view on mtr
+#export LESS='-R'
+#export LESSOPEN="|~/.lessfilter %s"
+#export LESSCOLORIZER=/usr/bin/pygmentize
+complete -C '/usr/local/bin/aws_completer' aws
+
+## ALIASES ##
+#alias lpr='lpr -P Rollright860'
+alias ll='ls -lXhp --color=auto'
+alias lt='ls -lhpXtr --color=auto'
+alias rm='rm -i'
+alias shred='shred -xvzu' # Warning! Completey destroys file(s)!
+alias zp='zypper'
+alias psc='ps xawf -eo pid,user,cgroup,args'
+alias psgrep='ps aux | grep $(echo $1 | sed "s/^\(.\)/[\1]/g")'
+alias t='/home/champ/bin/todo.sh'
+alias rot13="tr '[A-Za-z]' '[N-ZA-Mn-za-m]'"
+complete -F _todo t
+# Nifty extras
+alias shcwd='twistd -n web --path .' # Serve current directory tree at http://$HOSTNAME:8080/
+alias webshare='python -c "import SimpleHTTPServer;SimpleHTTPServer.test()"'
+alias servethis="python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'"
+alias pypath='python -c "import sys; print sys.path" | tr "," "\n" | grep -v "egg"'
+alias pycclean='find . -name "*.pyc" -exec rm {} \;'
+alias pymods='python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"'
+alias pysitepkgs='python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"'
+alias pytasks='grep --exclude-dir=.git -rEI "TODO|FIXME" . 2>/dev/null'
+alias djangoversion='python -c "import django; print(django.get_version())"'
+#alias ssh='ssh -R 10999:localhost:22'
+alias nethack='telnet nethack.alt.org'
+alias cmy='mysql -B -N -e'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias genpasswd="strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d '\n'; echo"
+alias lstree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
+alias websiteget="wget --random-wait -r -p -e robots=off -U mozilla"
+alias ipinfo="curl ifconfig.me && curl ifconfig.me/host"
+alias weather="curl http://weather.noaa.gov/pub/data/observations/metar/decoded/KSEA.TXT" # Seattle (see: http://www.metarreader.com/)
+alias utc='TZ=UTC date'  # OR: utc="date -u"
+alias starwars="telnet towel.blinkenlights.nl"
+alias timestamp='date "+%Y%m%dT%H%M%S"' # timestamps in ISO 8601 format
+alias cdgen='genisoimage -quiet -iso-level 3 -J -force-rr -l -N -d -allow-leading-dots -allow-multidot -V "`date --rfc-3339=seconds`" -r '
+alias cddump='dd if=/dev/dvd bs=2048 count=$(isosize -d 2048 /dev/dvd) conv=noerror,sync,notrunc' # `cddump | md5sum` || `cddump > disc.iso`
+alias cdburn='cdrecord fs=16m speed=8 padsize=63s -pad -dao -v -' # `cat disc.iso | cdburn`
+
+## FUNCTIONS ##
+function ffbookmarks() { sqlite3 ~/.mozilla/firefox/*.[dD]efault/places.sqlite "SELECT strftime('%Y-%m-%d %H:%M:%S', dateAdded/1000000, 'unixepoch', 'localtime'),url FROM moz_places, moz_bookmarks WHERE moz_places.id = moz_bookmarks.fk ORDER BY dateAdded;";
+#transfer() { if [ $# -eq 0 ]; then echo "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"; return 1; fi; tmpfile=$( mktemp -t transferXXX ); if tty -s; then basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g'); curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile; else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ; fi; cat $tmpfile; rm -f $tmpfile; }
+getlocation() { lynx -dump http://www.ip-adress.com/ip_tracer/?QRY=$1|grep address|egrep 'city|state|country'|awk '{print $3,$4,$5,$6,$7,$8}'|sed 's\ip address flag \\'|sed 's\My\\';}
+aptsearch(){ apt-cache search ^$1 | egrep --color=always "^[^-]+ "; }
+down4me() { curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g' ; }   #Check if a domain is down
+function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # aka "bartonski's box"
+function dusage() {
+df -lP|awk '{sum+=$3}END{printf "%d GiB\n", sum/2^20}';
+#df -lP|numsum -3|numprocess /%$(( 2**20 ))/
+}
+timeDNS() { parallel -j0 --gnu --tag dig @{} "$*" ::: 208.67.222.222 208.67.220.220 198.153.192.1 198.153.194.1 156.154.70.1 156.154.71.1 8.8.8.8 8.8.4.4 | grep Query | sort -nk5; }
+tolower(){ echo ${@,,}; } # Make function command 'tolower' that will convert all arguments to lowercase.
+function sgoogle { Q="$@"; GOOG_URL='https://www.google.de/search?tbs=li:1&q='; AGENT="Mozilla/4.0"; stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}" | grep -oP '\/url\?q=.+?&amp' | sed 's|/url?q=||; s|&amp||'); echo -e "${stream//\%/\x}"; } # Google verbatim search on your terminal
+google() {
+    #http://superuser.com/questions/47192/google-search-from-linux-terminal
+    search=""
+    echo "$1"
+    for term in $*; do
+        search="$search%20$term"
+    done
+    xdg-open "http://www.google.com/search?q=$search"
+}
+googlesay(){ curl -A RG translate\.google\.com/translate_tts -d "tl=en&q=$*" |mpg123 -; }; # Usage: googlesay "How are you?"
+netinfo ()  # Shows ip/mac/router address, etc.
+{
+        URL=http://icanhazip.com
+        echo "--------------- Network Information ---------------"
+        /sbin/ifconfig | awk /'inet addr/ {print $2}'
+        /sbin/ifconfig | awk /'Bcast/ {print $3}'
+        /sbin/ifconfig | awk /'inet addr/ {print $4}'
+        /sbin/ifconfig | awk /'HWaddr/ {print $4,$5}'
+    echo Current IP Address: $(curl -s ${URL} | grep -o "[[:digit:].]\+")
+    echo "---------------------------------------------------"
+}
+
+extract() { 
+    if [ -f $1 ] ; then 
+      case $1 in 
+        *.tar.bz2)   tar xjf $1     ;; 
+        *.tar.gz)    tar xzf $1     ;; 
+        *.bz2)       bunzip2 $1     ;; 
+        *.rar)       unrar e $1     ;; 
+        *.gz)        gunzip $1      ;;
+        *.tar)       tar xf $1      ;;
+        *.tbz2)      tar xjf $1     ;;
+        *.tgz)       tar xzf $1     ;;
+        *.zip)       unzip $1       ;;
+        *.Z)         uncompress $1  ;;
+        *.7z)        7z x $1        ;;
+        *)     echo "'$1' cannot be extracted via extract()" ;;
+         esac
+     else
+         echo "'$1' is not a valid file" 
+     fi
+}
+
+##== PROMPT ==##
+# Inspired by http://julien.palard.fr/dotfiles/bashrc
+str_sum()
+{
+    BC=$(which bc)
+    if [ -z "$1" ]
+    then
+        echo "Usage str_sum STRING"
+        return
+    fi
+    if [ -x "$BC" ] ; then 
+        printf "%s" "$1" | hexdump -b | head -n 1 | tr ' ' '+' \
+            | sed 's/\+*$//g' | bc
+    else
+        echo 0
+    fi
+}
+
+USERNAME_SUM=$(str_sum "$(whoami)")
+USERNAME_BOLD=$(( ($USERNAME_SUM + 1) % 2))
+USERNAME_HUE=$(( ($USERNAME_SUM + 2) % 6 + 31))
+
+HOSTNAME_SUM=$(str_sum "$(hostname)")
+HOSTNAME_BOLD=$(( ($HOSTNAME_SUM + 1) % 2))
+HOSTNAME_HUE=$(( ($HOSTNAME_SUM + 3) % 6 + 31))
+
+PATH_SUM=$(str_sum "$(pwd)")
+PATH_BOLD=$(( ($PATH_SUM + 1) % 2))
+PATH_HUE=$(( ($PATH_SUM + 12) % 6 + 31))
+
+USERNAME_COLOR=$'\E'"[$USERNAME_BOLD;${USERNAME_HUE}m"
+HOSTNAME_COLOR=$'\E'"[$HOSTNAME_BOLD;${HOSTNAME_HUE}m"
+PATH_COLOR=$'\E'"[$PATH_BOLD;${PATH_HUE}m"
+
+WHITE=$'\E[00m'
+GOLD=$'\E[0;33m'
+
+#PS1='\[\033[0;31m\]\u@\H\[\033[00m\]:\[\033[0;33m\]`pwd`\[\033[00m\]> '
+[ "$TERM" != 'linux' -a z"$TERM" != z'eterm-color' ] && TITLE="\[\033]0;\u@\H:\w\a\]" || TITLE=''
+export PS1="$TITLE\[$USERNAME_COLOR\]\u\[$WHITE\]@\[$HOSTNAME_COLOR\]\H\[$WHITE\]:\[$PATH_COLOR\]\w\[$WHITE\] "
+# .git-prompt.sh is here: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+if [ -f ~/.git-prompt.sh ]
+then
+    export PROMPT_COMMAND='__git_ps1 "'"$PS1"'" "\\\$ "'
+else
+    export PS1="$PS1"'\$ '
+fi
