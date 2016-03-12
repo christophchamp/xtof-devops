@@ -83,6 +83,9 @@ Sample output:
 +hydrogen.cert.u 216.218.254.202  2 u   19   64  377   35.950   -7.184   0.357
 -snag.rack911.co 66.90.104.142    3 u   57   64  377   33.695   -0.893   0.645
 
+Or, with no DNS resolving:
+$ ntpq -pn
+
 ==stress test==
     I think the independent_wallclock thing only works on Xen Classic. Also, the time on the host is right, and in xentop, the CPU usage for this instance never drops below 25%. I think this is virtualization related clock drift from high CPU load, too fast for NTP to correct. I don't believe Matt's suggestion will work, though I could be wrong.
 
@@ -138,3 +141,60 @@ Sample output:
     It sounds like they're running ntpdate while ntpd is going. ntpd doesn't want ntpdate messing with it's time. Though they claim an strace shows ntpd isn't changing the time, my recollection is that using ntpdate with ntpd running just doesn't work.
 
 https://community.rackspace.com/products/f/25/t/650
+
+==Leap second==
+SOURCE: http://stackoverflow.com/questions/26202730/how-to-find-out-if-the-linux-kernel-will-insert-a-leap-second-at-the-end-of-the
+AFAIK, the kernel does not keep advance notice of a leap second being scheduled. This knowledge is maintained by the NTP daemon, and when it's time to fudge the system clock, ntpd issues the adjtimex(2) syscall, to adjust the system clock.
+
+To poke your ntpd daemon:
+
+$ /usr/bin/ntpq -c 'lassoc' -c "mrv &1 &999 leap,srcadr,stratum"
+<pre>
+ind assid status  conf reach auth condition  last_event cnt
+===========================================================
+  1  1174  9014   yes   yes  none    reject   reachable  1
+  2  1175  962a   yes   yes  none  sys.peer    sys_peer  2
+  3  1176  942a   yes   yes  none candidate    sys_peer  2
+  4  1177  935a   yes   yes  none   outlyer    sys_peer  5
+  5  1178  942a   yes   yes  none candidate    sys_peer  2
+srcadr=108.61.194.85.vultr.com, leap=01, stratum=2
+
+srcadr=time.devry.net, leap=01, stratum=2
+
+srcadr=name1.glorb.com, leap=00, stratum=2
+
+srcadr=work.appus.org, leap=01, stratum=2
+
+srcadr=juniperberry.canonical.com, leap=00, stratum=2
+</pre>
+
+When you see "01" set for leap, you have a leap second headed your way. The "srcaddr" line is going to be repeated for every source your ntp server is configured for, so you might have multiple entries, there (my example returns the dummy local system cl
+
+==Fix==
+$ cat /etc/ntp.conf
+# Undisciplined Local Clock. This is a fake driver intended for backup
+# and when no outside source of synchronized time is available.
+server  127.127.1.0
+fudge   127.127.1.0 stratum 10
+restrict 127.127.1.0
+
+==Check==
+The ntpd daemon synchronizes the local clock to one or more remote NTP servers or local timedelta sensors. ntpd can also act as an NTP server itself, redistributing the local time. Use the following syntax to run a sanity check on ntpd.conf:
+# ntpd -n
+# ntpd -f /usr/local/etc/ntpd.conf -n
+# ntpd -d -f /usr/local/etc/ntpd.conf -n
+
+Where,
+
+    -n : Only check the configuration file for validity.
+    -f /usr/local/etc/ntpd.conf : Use /usr/local/etc/ntpd.conf file as the configuration file, instead of the default /etc/ntpd.conf.
+    -d : Do not daemonize and ntpd will run in the foreground and log to stderr.
+
+==Qstack==
+sudo service ntp stop
+sudo ntpd -gq
+sudo service ntp start
+
+qstack-mgmt> date -s "3 FEB 2016 12:30:00"
+hwclock --systohc
+reboot
