@@ -1,0 +1,4 @@
+$ cgpt prioritize "$(cgpt find -t coreos-usr | grep --invert-match "$(findmnt --noheadings --raw --output=source --target=/usr)")"
+
+==External links==
+* [https://coreos.com/os/docs/latest/manual-rollbacks.html Performing Manual CoreOS Rollbacks]
