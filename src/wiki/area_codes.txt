@@ -1,0 +1,548 @@
+Alabama 	205, 251, 256, 334, 659
+Alaska 	907
+Arizona 	480, 520, 602, 623, 928
+Arkansas 	479, 501, 870
+California 	209, 213, 310, 323, 341, 369, 408, 415, 424, 442, 510, 530, 559, 562, 619, 626, 627, 628, 650, 657, 661, 669, 707, 714, 747, 760, 764, 805, 818, 831, 858, 909, 916, 925, 935, 949, 951
+Colorado 	303, 719, 720, 970
+Connecticut 	203, 475, 860, 959
+Delaware 	302
+District of Columbia 	202
+Florida 	239, 305, 321, 352, 386, 407, 561, 689, 727, 754, 772, 786, 813, 850, 863, 904, 941, 954
+Georgia 	229, 404, 470, 478, 678, 706, 762, 770, 912
+Hawaii 	808
+Idaho 	208
+Illinois 	217, 224, 309, 312, 331, 447, 464, 618, 630, 708, 730, 773, 779, 815, 847, 872
+Indiana 	219, 260, 317, 574, 765, 812
+Iowa 	319, 515, 563, 641, 712
+Kansas 	316, 620, 785, 913
+Kentucky 	270, 364, 502, 606, 859
+Louisiana 	225, 318, 337, 504, 985
+Maine 	207
+Maryland 	227, 240, 301, 410, 443, 667
+Massachusetts 	339, 351, 413, 508, 617, 774, 781, 857, 978
+Michigan 	231, 248, 269, 313, 517, 586, 616, 679, 734, 810, 906, 947, 989
+Minnesota 	218, 320, 507, 612, 651, 763, 952
+Mississippi 	228, 601, 662, 769
+Missouri 	314, 417, 557, 573, 636, 660, 816, 975
+Montana 	406
+Nebraska 	308, 402
+Nevada 	702, 775
+New Hampshire 	603
+New Jersey 	201, 551, 609, 732, 848, 856, 862, 908, 973
+New Mexico 	505, 575
+New York 	212, 315, 347, 516, 518, 585, 607, 631, 646, 716, 718, 845, 914, 917
+North Carolina 	252, 336, 704, 828, 910, 919, 980, 984
+North Dakota 	701
+Ohio 	216, 234, 283, 330, 380, 419, 440, 513, 567, 614, 740, 937
+Oklahoma 	405, 580, 918
+Oregon 	503, 541, 971
+Pennsylvania 	215, 267, 412, 445, 484, 570, 610, 717, 724, 814, 835, 878
+Rhode Island 	401
+South Carolina 	803, 843, 864
+South Dakota 	605
+Tennessee 	423, 615, 731, 865, 901, 931
+Texas 	210, 214, 254, 281, 325, 361, 409, 430, 432, 469, 512, 682, 713, 737, 806, 817, 830, 832, 903, 915, 936, 940, 956, 972, 979
+Utah 	385, 435, 801
+Vermont 	802
+Virginia 	276, 434, 540, 571, 703, 757, 804
+Washington 	206, 253, 360, 425, 509, 564
+West Virginia 	304, 681
+Wisconsin 	262, 414, 608, 715, 920
+Wyoming 	307
+
+==Canada==
+Alberta 	403, 587, 780, 825
+British Columbia 	236, 250, 604, 778
+Manitoba 	204
+New Brunswick 	506
+Newfoundland and Labrador 	709
+Nova Scotia and Prince Edward Island 	902
+Ontario 	226, 289, 416, 519, 543, 613, 647, 705, 807, 905
+Quebec 	418, 438, 450, 514, 581, 819
+Saskatchewan 	306
+Yukon, Northwest Territories and Nunavut 	867
+
+==International mobile phone codes==
+Afghanistan 	+93 	75
+Albania 	+355 	6
+Antigua and Barbuda 	+1268 	7
+Argentina 	+54 	15
+Armenia 	+374 	9
+Australia 	+61 	4
+Austria 	+43 	650
+Austria 	+43 	660
+Austria 	+43 	664
+Austria 	+43 	676
+Austria 	+43 	680
+Austria 	+43 	681
+Austria 	+43 	688
+Austria 	+43 	699
+Azerbaijan 	+994 	50
+Azerbaijan 	+994 	55
+Azerbaijan 	+994 	70
+Bahamas 	+1242 	35
+Bahamas 	+1242 	45
+Bahamas 	+1242 	55
+Bahrain 	+973 	3
+Bangladesh 	+880 	181
+Bangladesh 	+880 	19
+Bangladesh 	+880 	17
+Bangladesh 	+880 	16
+Belarus 	+375 	25
+Belarus 	+375 	29
+Belarus 	+375 	33
+Belarus 	+375 	44
+Belgium 	+32 	47
+Belgium 	+32 	48
+Belgium 	+32 	49
+Belize 	+501 	6
+Benin 	+229 	9
+Bhutan 	+975 	17
+Bolivia 	+591 	7
+Bosnia and Herzegovina 	+387 	61
+Bosnia and Herzegovina 	+387 	62
+Bosnia and Herzegovina 	+387 	63
+Bosnia and Herzegovina 	+387 	65
+Botswana 	+267 	7
+Brazil 	+55 	7
+Brazil 	+55 	8
+Brazil 	+55 	9
+Brunei 	+673 	8
+Bulgaria 	+359 	87
+Bulgaria 	+359 	88
+Bulgaria 	+359 	89
+Bulgaria 	+359 	48
+Burkina Faso 	+226 	7
+Burundi 	+257 	7
+Cambodia 	+855 	9
+Cape Verde 	+238 	9
+Chile 	+56 	98
+Chile 	+56 	99
+People's Republic of China 	+86 	13
+People's Republic of China 	+86 	15
+Colombia 	+57 	31
+Comoros 	+269 	3
+Republic of Congo 	+242 	4
+Republic of Congo 	+242 	5
+Republic of Congo 	+242 	6
+Democratic Republic of Congo 	+243 	22
+Democratic Republic of Congo 	+243 	78
+Democratic Republic of Congo 	+243 	81
+Democratic Republic of Congo 	+243 	84
+Democratic Republic of Congo 	+243 	85
+Democratic Republic of Congo 	+243 	86
+Democratic Republic of Congo 	+243 	88
+Democratic Republic of Congo 	+243 	89
+Democratic Republic of Congo 	+243 	90
+Democratic Republic of Congo 	+243 	94
+Democratic Republic of Congo 	+243 	95
+Democratic Republic of Congo 	+243 	96
+Democratic Republic of Congo 	+243 	97
+Democratic Republic of Congo 	+243 	98
+Democratic Republic of Congo 	+243 	99
+Costa Rica 	+506 	3
+Croatia 	+385 	9
+Cuba 	+53 	5
+Cyprus 	+357 	99
+Cyprus 	+357 	96
+Cyprus 	+357 	97
+Czech Republic 	+420 	60
+Czech Republic 	+420 	72
+Czech Republic 	+420 	73
+Czech Republic 	+420 	77
+Denmark 	+45 	30
+Denmark 	+45 	40
+Djibouti 	+253 	8
+Dominica 	+1-767 	2
+East Timor 	+670 	7
+Ecuador 	+593 	9
+Ecuador 	+593 	8
+Egypt 	+20 	1
+El Salvador 	+503 	7
+Equatorial Guinea 	+240 	2
+Eritrea 	+291 	7
+Estonia 	+372 	5
+Ethiopia 	+251 	91
+Fiji 	+679 	9
+Finland 	+358 	4
+Finland 	+358 	50
+France 	+33 	6
+Gambia 	+220 	7
+Gambia 	+220 	9
+Georgia 	+995 	7
+Georgia 	+995 	9
+Germany 	+49 	15
+Germany 	+49 	16
+Germany 	+49 	17
+Germany 	+49 	700
+Ghana 	+233 	28
+Gibraltar 	+350 	58
+Greece 	+30 	693
+Greece 	+30 	694
+Greece 	+30 	697
+Greece 	+30 	699
+Grenada 	+1473 	41
+Guatemala 	+502 	5
+Guatemala 	+502 	4
+Guinea 	+224 	6
+Guinea-Bissau 	+245 	6
+Guinea-Bissau 	+245 	7
+Guyana 	+592 	6
+Honduras 	+504 	3
+Honduras 	+504 	8
+Honduras 	+504 	9
+Hong Kong 	+852 	5
+Hong Kong 	+852 	6
+Hong Kong 	+852 	9
+Hungary 	+36 	20
+Hungary 	+36 	30
+Hungary 	+36 	70
+Iceland 	+354 	6
+Iceland 	+354 	8
+India 	+91 	9
+Indonesia 	+62 	8
+Iran 	+98 	9
+Ireland 	+353 	8
+Israel 	+972 	5
+Italy 	+39 	310
+Italy 	+39 	31100
+Italy 	+39 	31101
+Italy 	+39 	31102
+Italy 	+39 	31103
+Italy 	+39 	31104
+Italy 	+39 	31105
+Italy 	+39 	313
+Italy 	+39 	319
+Italy 	+39 	320
+Italy 	+39 	322
+Italy 	+39 	323
+Italy 	+39 	327
+Italy 	+39 	328
+Italy 	+39 	329
+Italy 	+39 	330
+Italy 	+39 	331
+Italy 	+39 	333
+Italy 	+39 	334
+Italy 	+39 	335
+Italy 	+39 	336
+Italy 	+39 	337
+Italy 	+39 	338
+Italy 	+39 	339
+Italy 	+39 	340
+Italy 	+39 	341
+Italy 	+39 	343
+Italy 	+39 	345
+Italy 	+39 	346
+Italy 	+39 	347
+Italy 	+39 	348
+Italy 	+39 	349
+Italy 	+39 	350
+Italy 	+39 	360
+Italy 	+39 	361
+Italy 	+39 	362
+Italy 	+39 	363
+Italy 	+39 	366
+Italy 	+39 	368
+Italy 	+39 	370
+Italy 	+39 	373
+Italy 	+39 	377
+Italy 	+39 	380
+Italy 	+39 	388
+Italy 	+39 	389
+Italy 	+39 	390
+Italy 	+39 	391
+Italy 	+39 	392
+Italy 	+39 	393
+Italy 	+39 	397
+Ivory Coast 	+225 	0
+Ivory Coast 	+225 	6
+Japan 	+81 	70
+Japan 	+81 	80
+Japan 	+81 	90
+Jordan 	+962 	7
+Kazakhstan 	+7 	70
+Kazakhstan 	+7 	777
+Kenya 	+254 	7
+Kosovo 	+381 	377
+Kuwait 	+965 	6
+Kuwait 	+965 	7
+Kuwait 	+965 	9
+Kyrgyzstan 	+996 	5
+Laos 	+856 	20
+Latvia 	+371 	2xx
+Lebanon 	+961 	3
+Lebanon 	+961 	70
+Lebanon 	+961 	71
+Lesotho 	+266 	58
+Lesotho 	+266 	6
+Libya 	+218 	91
+Liechtenstein 	+423 	7
+Lithuania 	+370 	6
+Luxembourg 	+352 	621
+Luxembourg 	+352 	628
+Luxembourg 	+352 	661
+Luxembourg 	+352 	668
+Luxembourg 	+352 	691
+Luxembourg 	+352 	698
+Macau 	+853 	6
+Republic of Macedonia 	+389 	70
+Republic of Macedonia 	+389 	71
+Republic of Macedonia 	+389 	75
+Republic of Macedonia 	+389 	76
+Republic of Macedonia 	+389 	77
+Republic of Macedonia 	+389 	78
+Madagascar 	+261 	3
+Malawi 	+265 	8
+Malawi 	+265 	9
+Malaysia 	+60 	1
+Maldives 	+960 	7
+Maldives 	+960 	9
+Mali 	+223 	3
+Mali 	+223 	4
+Mali 	+223 	5
+Mali 	+223 	6
+Mali 	+223 	9
+Malta 	+356 	79
+Malta 	+356 	99
+Mauritania 	+222 	6
+Mauritius 	+230 	7
+Mauritius 	+230 	8
+Mauritius 	+230 	9
+Mexico 	+52 	1
+Moldova 	+373 	65
+Moldova 	+373 	68
+Moldova 	+373 	69
+Moldova 	+373 	76
+Moldova 	+373 	78
+Moldova 	+373 	79
+Monaco 	+377 	4
+Monaco 	+377 	6
+Montenegro 	+382 	6
+Mongolia 	+976 	9
+Morocco 	+212 	6
+Mozambique 	+258 	8
+Myanmar 	+95 	9
+Nauru 	+674 	555
+Nepal 	+977 	98
+Netherlands 	+31 	6
+New Zealand 	+64 	20
+New Zealand 	+64 	21
+New Zealand 	+64 	24
+New Zealand 	+64 	25
+New Zealand 	+64 	27
+New Zealand 	+64 	28
+New Zealand 	+64 	29
+Nicaragua 	+505 	8
+Nigeria 	+234 	80
+Nigeria 	+234 	90
+Norway 	+47 	4
+Norway 	+47 	9
+Oman 	+968 	968
+Pakistan 	+92 	300
+Pakistan 	+92 	301
+Pakistan 	+92 	302
+Pakistan 	+92 	306
+Pakistan 	+92 	307
+Pakistan 	+92 	308
+Pakistan 	+92 	309
+Pakistan 	+92 	345
+Pakistan 	+92 	346
+Pakistan 	+92 	344
+Pakistan 	+92 	343
+Pakistan 	+92 	342
+Pakistan 	+92 	333
+Pakistan 	+92 	334
+Pakistan 	+92 	332
+Pakistan 	+92 	331
+Pakistan 	+92 	321
+Pakistan 	+92 	322
+Pakistan 	+92 	323
+Pakistan 	+92 	303
+Pakistan 	+92 	304
+Pakistan 	+92 	320
+Pakistan 	+92 	335
+Palestinian Authority 	+970 	59
+Panama 	+507 	5
+Panama 	+507 	6
+Panama 	+507 	7
+Panama 	+507 	4
+Papua New Guinea 	+675 	68
+Papua New Guinea 	+675 	69
+Paraguay 	+595 	9
+Peru 	+51 	9
+Philippines 	+63 	9
+Poland 	+48 	50
+Poland 	+48 	51
+Poland 	+48 	60
+Poland 	+48 	66
+Poland 	+48 	69
+Poland 	+48 	72
+Poland 	+48 	78
+Poland 	+48 	79
+Poland 	+48 	88
+Portugal 	+351 	9
+Qatar 	+974 	5
+Qatar 	+974 	6
+Romania 	+40 	7
+Russia 	+7 	9
+Rwanda 	+250 	08
+Samoa 	+685 	77
+San Marino 	+378 	66
+Sao Tome and Principe 	+239 	90
+Saudi Arabia 	+966 	50
+Saudi Arabia 	+966 	54
+Saudi Arabia 	+966 	55
+Saudi Arabia 	+966 	56
+Senegal 	+221 	5
+Senegal 	+221 	6
+Serbia 	+381 	6
+Seychelles 	+248 	5
+Seychelles 	+248 	7
+Sierra Leone 	+232 	23
+Sierra Leone 	+232 	30
+Sierra Leone 	+232 	33
+Sierra Leone 	+232 	7
+Singapore 	+65 	8
+Singapore 	+65 	9
+Slovakia 	+421 	9
+South Africa 	+27 	7
+South Africa 	+27 	8
+South Korea 	+82 	10
+South Korea 	+82 	11
+South Korea 	+82 	16
+South Korea 	+82 	17
+South Korea 	+82 	18
+South Korea 	+82 	19
+Spain 	+34 	6
+Sri Lanka 	+94 	7
+Sudan 	+249 	9
+Suriname 	+597 	8
+Swaziland 	+268 	60
+Sweden 	+46 	70
+Sweden 	+46 	73
+Sweden 	+46 	76
+Switzerland 	+41 	74
+Switzerland 	+41 	76
+Switzerland 	+41 	77
+Switzerland 	+41 	78
+Switzerland 	+41 	79
+Syria 	+963 	9
+Taiwan 	+886 	9
+Tajikistan 	+992 	9
+Tanzania 	+255 	74
+Thailand 	+66 	1
+Thailand 	+66 	89
+Togo 	+228 	9
+Tunisia 	+216 	2
+Tunisia 	+216 	9
+Turkey 	+90 	5
+Uganda 	+256 	7
+Ukraine 	+380 	39
+Ukraine 	+380 	50
+Ukraine 	+380 	63
+Ukraine 	+380 	66
+Ukraine 	+380 	67
+Ukraine 	+380 	68
+Ukraine 	+380 	97
+United Arab Emirates 	+971 	50
+United Arab Emirates 	+971 	55
+United Kingdom 	+44 	75
+United Kingdom 	+44 	77
+United Kingdom 	+44 	78
+United Kingdom 	+44 	79
+Uruguay 	+598 	94
+Uruguay 	+598 	95
+Uruguay 	+598 	96
+Uruguay 	+598 	97
+Uruguay 	+598 	98
+Uruguay 	+598 	99
+Uzbekistan 	+998 	9
+Vanuatu 	+678 	4
+Vanuatu 	+678 	5
+Venezuela 	+58 	4
+Vietnam 	+84 	9
+Yemen 	+967 	7
+Zambia 	+260 	9
+Zimbabwe 	+263 	11
+Zimbabwe 	+263 	23
+Zimbabwe 	+263 	91
+
+==External links==
+http://www.fonefinder.net/
+
+==Phone2email (USA)==
+Carrier 	Email to SMS Gateway
+Alltel				[10-digit phone number]@message.alltel.com
+AT&T (formerly Cingular) 	[10-digit phone number]@txt.att.net
+				[10-digit phone number]@mms.att.net (MMS)
+				[10-digit phone number]@cingularme.com
+Boost Mobile 			[10-digit phone number]@myboostmobile.com
+Nextel (now Sprint Nextel) 	[10-digit phone number]@messaging.nextel.com
+Sprint PCS (now Sprint Nextel) 	[10-digit phone number]@messaging.sprintpcs.com
+				[10-digit phone number]@pm.sprint.com (MMS)
+T-Mobile 			[10-digit phone number]@tmomail.net
+US Cellular		 	[10-digit phone number]email.uscc.net (SMS)
+				[10-digit phone number]@mms.uscc.net (MMS)
+Verizon 			[10-digit phone number]@vtext.com
+				[10-digit phone number]@vzwpix.com (MMS)
+Virgin Mobile USA 		[10-digit phone number]@vmobl.com
+
+==phone2email (international)==
+7-11 Speakout (USA GSM) 	number@cingularme.com
+Airtel (Karnataka, India) 	number@airtelkk.com
+Airtel Wireless (Montana, USA) 	number@sms.airtelmontana.com
+Alaska Communications Systems 	number@msg.acsalaska.com
+Aql 	number@text.aql.com
+AT&T Enterprise Paging 	number@page.att.net
+BigRedGiant Mobile Solutions 	number@tachyonsms.co.uk
+Bell Mobility & Solo Mobile (Canada) 	number@txt.bell.ca
+BPL Mobile (Mumbai, India) 	number@bplmobile.com
+Cellular One (Dobson) 	number@mobile.celloneusa.com
+Cingular (Postpaid) 	number@cingularme.com
+Centennial Wireless 	number@cwemail.com
+Cingular (GoPhone prepaid) 	number@cingularme.com (SMS)
+Claro (Brasil) 	number@clarotorpedo.com.br
+Claro (Nicaragua) 	number@ideasclaro-ca.com
+Comcel 	number@comcel.com.co
+Cricket 	number@sms.mycricket.com (SMS)
+CTI 	number@sms.ctimovil.com.ar
+Emtel (Mauritius) 	number@emtelworld.net
+Fido (Canada) 	number@fido.ca
+General Communications Inc. 	number@msg.gci.net
+Globalstar (satellite) 	number@msg.globalstarusa.com
+Helio 	number@myhelio.com
+Illinois Valley Cellular 	number@ivctext.com
+Iridium (satellite) 	number@msg.iridium.com
+i wireless 	number.iws@iwspcs.net
+Koodo Mobile (Canada) 	number@msg.koodomobile.com
+Meteor (Ireland) 	number@sms.mymeteor.ie
+Mero Mobile (Nepal) 	977number@sms.spicenepal.com
+MetroPCS 	number@mymetropcs.com
+Movicom 	number@movimensaje.com.ar
+Mobitel (Sri Lanka) 	number@sms.mobitel.lk
+Movistar (Colombia) 	number@movistar.com.co
+MTN (South Africa) 	number@sms.co.za
+MTS (Canada) 	number@text.mtsmobility.com
+Nextel (United States) 	number@messaging.nextel.com
+Nextel (Argentina) 	TwoWay.11number@nextel.net.ar
+Orange Polska (Poland) 	9digit@orange.pl
+Personal (Argentina) 	number@alertas.personal.com.ar
+Plus GSM (Poland) 	+48number@text.plusgsm.pl
+President’s Choice (Canada) 	number@txt.bell.ca
+Qwest 	number@qwestmp.com
+Rogers (Canada) 	number@pcs.rogers.com
+SL Interactive (Australia) 	number@slinteractive.com.au
+Sasktel (Canada) 	number@sms.sasktel.com
+Setar Mobile email (Aruba) 	297+number@mas.aw
+Suncom 	number@tms.suncom.com
+T-Mobile (Austria) 	number@sms.t-mobile.at
+T-Mobile (UK) 	number@t-mobile.uk.net
+Telus Mobility (Canada) 	number@msg.telus.com
+Thumb Cellular 	number@sms.thumbcellular.com
+Tigo (Formerly Ola) 	number@sms.tigo.com.co
+Tracfone (prepaid) 	number@mmst5.tracfone.com
+Unicel 	number@utext.com
+Virgin Mobile (Canada) 	number@vmobile.ca
+Vodacom (South Africa) 	number@voda.co.za
+YCC 	number@sms.ycc.ru
+MobiPCS (Hawaii only) 	number@mobipcs.net
