@@ -1,0 +1,2 @@
+$ findmnt --noheadings --raw --output=source --target=/boot
+/dev/sda1
