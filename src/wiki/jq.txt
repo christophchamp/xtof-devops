@@ -1,0 +1,1 @@
+ls | jq -R -s -c 'split("\n")'
