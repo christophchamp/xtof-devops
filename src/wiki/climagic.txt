@@ -906,3 +906,53 @@ printf "\e[%dm%d dark\e[0m  \e[%d;1m%d bold\e[0m\n" {30..37}{,,,} # Show your ba
 http://www.vurt.ru/2013/02/python-command-line-oneliners/
 http://find.unixpin.com/ # CLI helper
 printf "%s\n" ',s/foo/bar/g' wq | ed -s myfile.txt # in-line editing of files
+
+==March 2016==
+seq 20 | shuf # Generate a random ordered list of 20 numbers. For example to determine order of presentation.
+find . -exec file -b --mime-type {} + | sort | uniq -c | sort -nr # Make stats of the top file types in this directory and below.
+shopt -u huponexit # in bash, set this option to make sure backgrounded jobs don't get killed when the parent shell exits
+pgrep rsync | xargs ionice -c3 -p # Adjust all rsync processes on the system so that they have lower (idle) IO priority.
+ps wu -U someuser # An easy way of selecting the processes owned by someuser.
+curl -sL https://www.drownattack\.com/top-sites |html2text|awk -F\. '/^[0-9]+/{print $NF}' |sort|uniq -c|sort -nr # Drownattack TLD stats
+cal 9 1752 # Stump your friends. How many months had only 19 days? Answer: 1 (When we switched to Gregorian. Actual month depends on locale)
+(head -5; tail -5) < log # Show the first and last 5 lines of the file 'log'
+:let i = 1 | g/|Population=/s/|Population=/\=printf("|Data5=%d|Population=", i)/ | let i = i+1 # vim add column Data5=N with an inc. number
+pidstat 2 5 # Show % reports of CPU statistics for every active task in the server at two second intervals
+for f in *; do b=$(echo "$f" | tr '[A-Z]' '[a-z]'); mv "$f" "$b"; done # Lower case all files in a folder
+yes "$(seq 19 21; seq 21 -1 18)" |while read i; do printf "\x1b[48;5;${i}m\n"; sleep .03; done # Make some waves. Req 256-color term
+find . -maxdepth 1 -type f -printf '%TY-%Tm\n' | sort | uniq -c # counts files in the current path by modification month
+awk '{ print substr($0, index($0,$3)) }' mail.log # Print all from 3rd field to end of line. Very useful for log parsing
+fgrep --binary-files=text -C 2000 "string in file" /dev/sda > recovereddata.out # *"Attempt"* to recover an accidentally removed file
+export LESS='-sCmqPm--Less--(?eEND:%pb\%.)' # Make less more like more, but still more than more. Percent of file in prompt, etc.
+export LESS="-S -j10 -i" # This environment variable will invoke 'less' with these options when it is used. Like when viewing a man page
+TEXT="measure the length of this text" ; echo ${#TEXT} # One way to print out the length of text using a variable
+rpm -qa --queryformat "%{NAME} %{INSTALLTIME:date}\n" | grep "Nov 2015" # In RPM, determine which packages where installed in Nov 2015
+find music -name '*.mp3' -mtime +365 -a -size +10M -ls # Find and long list mp3 files in Music dir older than a year and larger than 10MB
+identify -format "%f F:%[EXIF:Flash]\n" *.jpg | egrep " F:(0|16|24|32)$" # Show photo filenames where no flash was used. Req. Imagemagick
+curl -N --limit-rate 16K http://f.climagic\.org/techsup.mp3 | mpg123 - # Stream mp3 at bitrate speed (128Kbits). WARNING: NSFW "lyrics"
+egrep -wo "(Donnie|Frank|Roberta|Grandma)" story.txt |sort|uniq -c|sort -r # Search for names and build a frequency count for each name
+df -lP |awk '{sum += $3} END {printf "%d GiB\n", sum/2**20}' # Show the total space used on all your local disk partitions
+for dir in */ ; do echo "${dir%/}" ; done # Use the */ trick to get only the directories, then use ${dir%/} to remove the trailing / you get
+grep -P -o '(?<=href=")http:\S+(?=")' *.html # Use perl regex (negative look-behind/look-ahead assertions) to get URLs
+convert -size 1280x720 plasma:green-blue background.png # Create a 1280x720 color plasma image. Different each time. Uses ImageMagick
+strings /dev/urandom | tr -c -d '0-9' | dd of=randomnumbers.txt bs=1 count=1M # Write 1MB (1048576) of random numbers to a file
+sed "/bang/ s/foo/bar/" # Replace foo with bar only on lines that contain 'bang'. Use in pipeline or with file args
+Server: nc -l 8762 < video.mpg Client: nc server 8762 | mplayer -cache 1000 - # Poor man's video streaming service at video bitrate
+rig # rig is this cool little program that generates random identities
+play -n synth pl G2 pl B2 pl D3 pl G3 pl D4 pl G4 delay 0 .05 .1 .15 .2 .25 remix - fade 0 4 .1 norm -1 # Guitar strum. play is from sox pkg
+sudo shutdown -h 60 & mpg123 ambientmusic/*.mp3 # Play music for 60 minutes and then shutdown. Like sleep on alarm clock
+less +F filename.log # Using +F option or pressing F in less is similar to `tail -f filename.log` but can use less's features
+:set paste # In vim, when you want to paste in code, its often useful to 'set paste' so that the autoindent/syntax doesn't interfere
+vi macro: qajjddq # Record a macro called 'a' that moves down two lines (jj) and then deletes 1 line (dd). Run w/ @a, run 100 times 100@a
+curl -4 http://wttr\.in/
+find . -empty -type d # List of empty subdirectories of current directory
+diff <(openssl rsa -in my.key -modulus | grep Modulus) <(openssl x509 -in my.crt -modulus | grep Modulus) # Check if cert was signed by key
+alias hideprev='history -d $((HISTCMD-2)) && history -d $((HISTCMD-1))' # Hide the previous command you just ran and forgot to use space
+printf "\e[%dm%d dark\e[0m \e[%d;1m%d bold\e[0m\n" {30..37}{,,,} # Show your basic terminal text colors for terminal preferences change
+curl 'http://web.host/IMG_0[001-105].jpg …' -o "trip#1.jpg" # Download images named IMG_0001.jpg through IMG_0105.jpg and save with different name
+cut -d, -f1,5,10-15 data.csv > new.csv # Use cut to print out columns 1, 5 and 10 through 15 in data.csv and write that to new.csv
+ionice -c 3 cp vm1.img vm1-clone.img # Copy a file using "ionice -c 3" to give it idle priority to reduce load on the system
+fdupes -r dir > dupes.txt # Find file duplicates in 'dir' recursively based on size and mdsum and log to dupes.txt
+awk -F: {'print $1 ":" $2'} messages |uniq -c # Count syslog hits per minute in your messages log file. Useful for doing quick stats
+todo(){ cd ~/.todo||return 1&& l=$(ls -1t|head -n1)&&t=$(date +%Y%m%d);[[ "$1" == "last" ]]&&cp $l $t; ${EDITOR:-vi} $t;cd -;} # Todo list
+
