@@ -1,3 +1,9 @@
+sudo apt-get install mysql-server --fix-missing
+wget http://downloads.mysql.com/docs/world.sql.zip
+mysql> CREATE DATABASE world;
+mysql> USE world;
+mysql> SOURCE /home/ubuntu/world.sql;
+
 show engines;
 SHOW VARIABLES LIKE "have_%";
 SHOW STATUS WHERE Variable_name LIKE 'Max%';
@@ -15,8 +21,18 @@ FLUSH PRIVILEGES;
 GRANT ALL PRIVILEGES ON demodb.* to demouser@localhost;
 GRANT CREATE, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE, TRIGGER ON cchamp_staging.* to 'cchamp'@'10.179.195.45';
 
+---
+CREATE DATABASE IF NOT EXISTS foo;
+GRANT ALL PRIVILEGES ON *.* TO 'foo'@'localhost' identified by 'foo' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+---
+
+CREATE USER wp@localhost identified by 'some_password';
+GRANT ALL PRIVILEGES ON wp.* TO wp@localhost;
+FLUSH PRIVILEGES;
+
 * Assign or change a password for an existing account:
-SET PASSWORD FOR 'c4_usr'@'localhost' = PASSWORD('Antec1280!');
+SET PASSWORD FOR 'c4_usr'@'localhost' = PASSWORD('my_password');
 mysqladmin -u user_name -h host_name password "newpwd"
 
 SELECT User, Host, Password FROM mysql.user;
@@ -52,6 +68,8 @@ SELECT MONTHNAME(`start_datetime`) AS 'month', COUNT(incident_id) AS 'many', SUM
 
 ==Misc other queries==
 select SUM(data_length) + SUM(index_length) as size from information_schema.tables where table_schema = 'YOUR_TABLE_NAME';
+
+SELECT SOUNDEX('Hello'); # http://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_soundex
 
 ==Check on database/table sizes==
 mysql -u root -p -B -N -e "SELECT SUM((data_length+index_length)/power(1024,2)) tablesize_mb FROM information_schema.tables;"
@@ -97,6 +115,16 @@ FROM
         AND table_name='mytable'
     ) AA
 ) A,(SELECT 'B KBMBGBTB' units) B;
+
+* Another way:
+SELECT table_schema,
+        count(*) TABLES,
+        concat(round(sum(table_rows)/1000000,2),'M') rows,
+        round(sum(data_length)/(1024*1024*1024),2) DATA,
+        round(sum(index_length)/(1024*1024*1024),2) idx,
+        round(sum(data_length+index_length)/(1024*1024*1024),2) total_size,
+        round(sum(index_length)/sum(data_length),2) idxfrac
+        FROM information_schema.TABLES group by table_schema;
 
 ==Set timezone==
 
