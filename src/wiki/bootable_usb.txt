@@ -1,0 +1,57 @@
+==Method #1==
+
+    Plug in the USB flash drive and determine the device it's mounted on with the command:
+
+    sudo fdisk -l
+
+    This time around it was /dev/sdc1 for me, so I'll use that as my example.
+
+    Umount the device
+
+    umount /dev/sdc1
+
+    Not sure if necessary but I formatted the drive in FAT32, just in case
+
+    sudo mkdosfs -n 'USB-Drive-Name' -I /dev/sdc -F 32
+
+    Now my ISO was using isolinux not syslinux. I knew it worked with CDs so I figured out that I needed to call the isohybrid command, which allows for an ISO to be recognized by the BIOS from a hard drive.
+
+     isohybrid filename.iso
+
+    You can find out more about this command here, but this was the cause of the message "Missing Operating System" The first problem was fixed, but now it said "isolinux.bin was missing or corrupt"
+
+    The next step is to copy the iso. My second problem lay here, where I was copying to the partition, sdc1, not the device, sdc.
+
+    sudo dd if=filename.iso of=/dev/sdc bs=4k
+
+    This seems to work just fine, but the forum where I got the last fix, it was recommended to do the following before unplugging the device:
+
+    sync
+    sudo eject /dev/sdc
+
+==Method #2==
+Creating a bootable Ubuntu USB flash drive from terminal
+
+    Place the ubuntu.iso file in any hard disk partition.
+
+    Then mount the ubuntu.iso file with the below commands in terminal:
+
+    sudo mkdir /media/iso/
+    sudo mount -o loop /path/to/ubuntu.iso /media/iso
+
+    Insert your USB flash drive. My drive is /dev/sdd.
+
+Your drive may be automatically mounted inside /media/. Let's assume that it was mounted in /media/xxx/.
+
+Copy all files from /media/iso/ to your mounted USB flash drive by running the below command (make sure to include the dot):
+
+cp -a /media/iso/. /media/xxx/
+
+Next, you need the ldlinux.sys file in your USB flash drive to make the USB bootable. My USB partition is /dev/sdd1; enter lsblk to see what's yours. Run the below commands:
+
+sudo apt-get install syslinux mtools
+sudo syslinux -s /dev/sdd1
+
+Navigate to the /media/xxx mount folder and rename the isolinux directory to syslinux. Then go into the renamed folder and rename the file isolinux.cfg to syslinux.cfg.
+
+Reboot your PC and change the boot order in BIOS to allow booting from a USB drive. Now your Ubuntu USB flash drive will boot and you can install it
