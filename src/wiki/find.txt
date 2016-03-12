@@ -461,6 +461,11 @@ This can be broken down in two steps for legibility.
  few_flacs () { set -- $REPLY/*.flac(N); ((# <= 42)); }
  echo {.,**/*}(/+few_flacs)
 
+==Misc==
+find . -regextype sed -regex ".*/[a-f0-9\-]\{36\}\.jpg"
+
+* Ignore a given directory:
+find . -path ./.git -prune -o -type f -exec grep -H bc {} \;
 
 ==External links==
 * http://www.tecmint.com/mysqladmin-commands-for-database-administration-in-linux/
