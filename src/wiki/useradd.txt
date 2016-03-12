@@ -1,30 +1,35 @@
 usermod -aG wheel champ
 useradd -m -s /bin/bash -c "Christoph Champ" -G wheel champ
+chage -l champ
+usermod -e 2014-11-01 champ # set user account expiry date
+usermod -s /bin/bash champ # change user shell
+
 
 ==sudoers==
-On Ubuntu, its really simple.
+On Ubuntu, it is really simple.
 
-# adduser jak sudo
+# adduser bob sudo
 
-and you’re done!
+and you are done!
 
-On CentOS, theres a couple more steps.
-As root, run
+On CentOS, there are a couple more steps.
 
-# /usr/sbin/usermod -aG wheel jak
+As root, run:
+
+# /usr/sbin/usermod -aG wheel bob
 
 then edit the /etc/sudoers file
 
-# nano /etc/sudoers
+# vi /etc/sudoers
 
-go down and find this…
+change the following line from
 
 ## Allows people in group wheel to run all commands
 # %wheel ALL=(ALL) ALL
 
-and remove the hash in front of %wheel so it looks like…
+to:
 
 ## Allows people in group wheel to run all commands
 %wheel ALL=(ALL) ALL
 
-Once that’s done, your user “jak” is part of the wheel group, who are allowed to use sudo. 
+Once that is done, your user "bob" is part of the wheel group, who are allowed to use sudo. 
