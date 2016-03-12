@@ -5,7 +5,7 @@
 # Copyright © 2013 eNovance <licensing@enovance.com>
 #
 # Author: Emilien Macchi <emilien.macchi@enovance.com>
-# Modified by: Christoph Champ <christoph.champ@gmail.com>
+# Modified by: Christoph Champ <christoph.champ@gettyimages.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

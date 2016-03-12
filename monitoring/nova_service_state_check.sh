@@ -23,7 +23,7 @@ NOVA=/usr/bin/nova
 
 # Which nova services/hosts to ignore
 IGNORE_SERVICES=( 'nova-network' 'nova-console' )
-IGNORE_HOSTS=( 'nova-compute;node-14.example.local' ) # service;host
+IGNORE_HOSTS=( 'node-24.example.local' ) # service;host
 
 # Helper functions #############################################################
 
@@ -74,6 +74,17 @@ function contains() {
     return 1
 }
 
+function which_dc () {
+    # This ugly workaround is just to figure out which DC we are in, since the
+    # DNS records are either missing or inconsistent
+    DC=$(getent hosts $(awk '/nameserver/{print $2;exit}' /etc/resolv.conf) | \
+        awk '{print substr($2,1,3)}')
+    if [[ "${DC}" == "fue" ]]; then
+        DC="lab"
+    fi
+    echo ${DC}
+}
+
 # Main #########################################################################
 
 # Verbosity level
@@ -108,8 +119,8 @@ done
 
 #== Main block: Check if any nova services are down ===========================
 raw=($(${NOVA} service-list 2>/dev/null |\
-       awk '$2 ~ /[0-9]/{gsub(/\.(example.com|example.local)/, "");
-            printf "%s;%s;%s\n",$4,$6,$12}'))
+       awk -F'|' '$2 ~ /[0-9]/{gsub(/ |\t/,"");
+       printf "%s;%s;%s;%s\n",$4,$3,$6,$7}'))
 service_array=($(tr ' ' '\n' <<< "${raw[@]}" | sort | tr '\n' ' '))
 
 if [[ ${#service_array[@]} -eq 0 ]]; then
@@ -117,31 +128,52 @@ if [[ ${#service_array[@]} -eq 0 ]]; then
     exit $STATE_CRITICAL
 fi
 
-declare -A alert_array
+declare -A result
 for service_data in ${service_array[@]}; do
-    service=$(echo ${service_data} | cut -d';' -f1)
-    node=$(echo ${service_data} | cut -d';' -f2)
-    state=$(echo ${service_data} | cut -d';' -f3)
+    host=$(echo ${service_data} | cut -d';' -f1)
+    node=$(echo ${service_data} | awk -F';' '{
+        gsub(/\.(example.com|example.local)/,"");print $1}')
+    node_name=${node/-/_} # since bash array keys can not contain hyphens
+    service=$(echo ${service_data} | cut -d';' -f2)
+    enabled=$(echo ${service_data} | cut -d';' -f3)
+    state=$(echo ${service_data} | cut -d';' -f4)
     if ! $(contains "${IGNORE_SERVICES[@]}" "${service}") && \
-       [[ ${IGNORE_HOSTS[@]%%;*} != ${service} && \
-          ${IGNORE_HOSTS[@]#*;} != ${host} ]] && \
-       [ ${state} != "up" ]; then
+       ! $(contains "${IGNORE_HOSTS}" != "${host}") && \
+       [[ "${enabled}" == "enabled" && "${state}" != "up" ]]; then
         print_val "CRTICIAL;${service_data}"
-        alert_array["critical"]+="${service}::${node}; "
+        result[$node_name]+="${service} "
     else
         print_val "OK;${service_data}"
-        alert_array["ok"]+="${service}::${node}; "
     fi
 done
 
-print_val "-----"
+# We now construct a JSON string from the results of our check
+alert_output=""
+DC=$(which_dc) # Get the 3-letter data centre value (e.g., "sea")
+if [[ ${#result[@]} -gt 0 ]]; then
+    print_val "DEBUG: Services found = ${#result[@]}"
+    alert_output="{\"payload\":["
+    for node in ${!result[@]}; do
+        node_name=${node/_/-} # restore hyphens to node name (e.g., "node-1")
+        json="{\"id\":\"${DC}-$(date +%s)\",\"dc\":\"${DC}\","
+        json+="\"node\":\"${node_name}\",\"service\":\"${result[$node]%% }\","
+        json+="\"state\":\"down\"},"
+        alert_output+=${json}
+    done
+    alert_output="${alert_output%,}]}"
+fi
+read -r json_str <<< "${alert_output}"
 
 # Exit status with message
-if [[ ${#alert_array["critical"]} -gt 0 ]]; then
-    echo "${ALERT_NAME} CRITICAL: The following Nova services are down: {${alert_array["critical"]}}"
+if [[ ${#result[@]} -gt 0 ]]; then
+    payload=$(python -c 'import sys; import simplejson as json; \
+        data=json.dumps(json.loads(sys.stdin.read()),sort_keys=True,indent=4);\
+        print data' <<< "${json_str}")
+    msg="${ALERT_NAME} CRITICAL: The following ${#result[@]} services are "
+    msg+="down: ${payload}"
+    echo "${msg}"
     exit $STATE_CRITICAL
 else
-    #echo "${ALERT_NAME} OK: All Nova services are up: {${alert_array["ok"]}}"
     echo "${ALERT_NAME} OK: All Nova services are up"
     exit $STATE_OK
 fi

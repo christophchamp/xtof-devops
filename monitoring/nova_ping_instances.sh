@@ -36,7 +36,7 @@ DC=$(hostname|cut -d'-' -f3)
 JENKINS_DASHBOARD="http://jenkins.example.com:8080/view/Openstack-dashboard/"
 JENKINS_ENDPOINT="http://jenkins.example.com:8080/buildByToken/buildWithParameters"
 JENKINS_JOB="${DC}-sensu-receiver"
-JENKINS_TOKEN="<REDACED>"
+JENKINS_TOKEN="<REDACTED>"
 JENKINS_ISSUE_TYPE="check-nova-ping-instances"
 JENKINS_ALERT_FILE=/etc/sensu/plugins/.jenkins_alerts
 
@@ -113,29 +113,41 @@ function parse_fping_output() {
     echo "${parsed}"
 }
 
+function get_offline_hosts () {
+    raw=$(${SSH} ${SSH_PARAMS} "nova service-list" 2>/dev/null)
+    offline_hosts=($(awk -W posix -F'|' '/compute/{
+        gsub(" |\t","");gsub(/\.example.com/,"");
+        if($7=="down"){print $4}}' <<< "${raw}"))
+    echo "${offline_hosts}"
+}
+
 function get_instance_array() {
     # This function returns an array of all Nova instances whose values are
     # defined by $fields and who meet the following criteria:
+    #   - compute node must be online (as defined by `nova service-list`);
     #   - Any tenant;
     #   - Has a floating IP associated;
     #   - Is ACTIVE and running on a compute node; and
     #   - Has the "default" secgroup associated.
+    offline_hosts="$1"
     fields="name,OS-EXT-SRV-ATTR:hypervisor_hostname,OS-EXT-STS:vm_state,"
     fields+="status,networks,security_groups"
     raw=$(${SSH} ${SSH_PARAMS} "nova list --all-tenants --fields ${fields}" 2>/dev/null)
-    instance_array=($(awk -W posix -F'|' '$2 ~ /[[:alnum:]-]{36}/{
+    instance_array=($(awk -W posix -F'|' -vignore_hosts=${offline_hosts} '
+          $2 ~ /[[:alnum:]-]{36}/{
           nets=match($7, /, 10\.*/);tendot=substr($7,nets+2);
           secgrp=match($8,/default/);gsub(" |\t","");
           gsub(/(.example.com|.example.local)/,"",$4);
           if(tendot ~ /10\./ && secgrp>0 && \
-          tolower($5)=="active" && tolower($6)=="active"){
+          tolower($5)=="active" && tolower($6)=="active" && $4!=ignore_hosts){
           printf "%s;%s;%s;%s\n", $2,$3,$4,tendot}}' <<< "${raw}"))
 
     echo ${instance_array[@]}
 }
 
 #== Start of actual check =====================================================
-instance_array=($(get_instance_array))
+offline_hosts=$(get_offline_hosts)
+instance_array=($(get_instance_array ${offline_hosts}))
 
 if [[ ${#instance_array[@]} -eq 0 ]]; then
     echo "${ALERT_NAME} CRITICAL: Unable to communicate with nova!"

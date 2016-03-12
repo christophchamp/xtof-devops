@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ################################################################################
-# Nagios plugin to monitor iDRAC RAID states                                   #
+# Sensu plugin to monitor iDRAC RAID states                                    #
 ################################################################################
 
-ALERT_NAME="iDRAC RAID"
-VERSION="Version 1.0"
+ALERT_NAME="RaidStatusCheck"
+VERSION="Version 1.2"
 AUTHOR="Christoph Champ <christoph.champ@gmail.com>"
 
 PROGNAME=$(`which basename` $0)
@@ -19,8 +19,6 @@ STATE_DEPENDENT=4
 
 SSHPASS=$(which sshpass)
 FUEL=$(which fuel)
-#FUEL_HOST=$(getent hosts $(ifconfig eth2 | awk '/inet addr/{print substr($2,6)}'))
-FUEL_HOST=$(cut -d'-' -f2 /etc/motd)
 
 #DISK_TYPES=(pdisks vdisks)
 DISK_TYPES=(vdisks)
@@ -40,82 +38,71 @@ function print_revision {
    echo "$PROGNAME - $VERSION"
 }
 
-function print_usage {
-   # Print a short usage statement
-   echo "Usage: $PROGNAME [-v] [-V]"
-}
-
-function print_help {
-   # Print detailed help information
-   print_revision
-   echo -e "$AUTHOR\n\nCheck ${ALERT_NAME} cluster operation\n"
-   print_usage
-
-   /bin/cat <<__EOT
-
-Options:
--h
-   Print detailed help screen
--V
-   Print version information
--v
-   Verbose output
-__EOT
-}
-
 function print_val {
   if [[ $verbosity -ge 1 ]]; then
     echo $1
   fi
 }
 
-# Main #########################################################################
+function which_dc () {
+    # This ugly workaround is just to figure out which DC we are in, since the
+    # DNS records are either missing or inconsistent
+    DC=$(getent hosts $(awk '/nameserver/{print $2;exit}' /etc/resolv.conf) | \
+        awk '{print substr($2,1,3)}')
+    if [[ "${DC}" == "fue" ]]; then
+        DC="lab"
+    fi
+    echo ${DC}
+}
 
 # Verbosity level
 verbosity=0
 
+usage ()
+{
+    echo -e "\n${ALERT_NAME} - ${VERSION}\n${AUTHOR}\n\n"
+    echo "Usage: ${PROGNAME} [OPTIONS]"
+    echo " -h             Get help"
+    echo " -u <username>  iDrac admin username"
+    echo " -p <password>  iDrac admin password"
+    echo " -V             Print version information"
+    echo " -v             Verbose output"
+    echo -e "\nExample:"
+    echo "./${PROGNAME} -u root -p password"
+}
+
 # Parse command line options
-while [ "$1" ]; do
-   case "$1" in
-       -h | --help)
-           print_help
-           exit $STATE_OK
-           ;;
-       -V | --version)
-           print_revision
-           exit $STATE_OK
-           ;;
-       -v | --verbose)
-           : $(( verbosity++ ))
-           shift
-           ;;
-       -?)
-           print_usage
-           exit $STATE_OK
-           ;;
-       *)
-           echo "$PROGNAME: Invalid option '$1'"
-           print_usage
-           exit $STATE_UNKNOWN
-           ;;
-   esac
+while getopts 'hu:p:Vv' OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit $STATE_OK
+            ;;
+        V)
+            print_revision
+            exit $STATE_OK
+            ;;
+        v)
+            : $(( verbosity++ ))
+            shift
+            ;;
+        u)
+            export USERNAME=$OPTARG
+            ;;
+        p)
+            export PASSWORD=$OPTARG
+            ;;
+        *)
+            echo "$PROGNAME: Invalid option '$1'"
+            usage
+            exit $STATE_UNKNOWN
+            ;;
+    esac
 done
 
-function get_user_passwd() {
-    if [[ ${FUEL_HOST} == "lab" ]]; then
-        local user=root
-        local passwd=<REDACTED>
-        printf "%s;%s" ${user} ${passwd}
-    elif [[ ${FUEL_HOST} == "ash" ]]; then
-        local user=root
-        local passwd=<REDACTED>
-        printf "%s;%s" ${user} ${passwd}
-    elif [[ ${FUEL_HOST} == "sea" ]]; then
-        local user=root
-        local passwd=<REDACTED>
-        printf "%s;%s" ${user} ${passwd}
-    fi
-}
+# Main #########################################################################
+DC=$(which_dc)
 
 declare -a critical_services=()
 critical=0
@@ -123,13 +110,13 @@ function get_state() {
     local host="$1"
     local disk_type="$2"
     local check_domain=$(getent hosts ${host} || echo "")
-    local domain=$(echo ${check_domain}|awk '{print (length($2)>0) ? $2 : "unknown-domain"}')
-    local user_passwd=$(get_user_passwd)
+    local domain=$(echo ${check_domain} | \
+        awk '{print (length($2)>0) ? $2 : "unknown-domain"}')
     local rc=0
-    local OUTPUT=$(${SSHPASS} -p${user_passwd[@]#*;} \
+    local OUTPUT=$(${SSHPASS} -p ${PASSWORD} \
                    ssh -o StrictHostKeyChecking=no \
                    -o PreferredAuthentications=password \
-                   -o PubkeyAuthentication=no ${user_passwd[@]%%;*}@${host} \
+                   -o PubkeyAuthentication=no ${USERNAME}@${host} \
                    racadm raid get ${disk_type} -o -p State 2>/dev/null) || rc="$?"
     if [[ "$rc" -ne 0 ]]; then
         echo "UNKNOWN: sshpass can not log into iDrac on ${host}"
@@ -155,12 +142,11 @@ function get_state() {
 function get_compute_idrac_ips() {
     if [[ ${FUEL_HOST} == "lab" ]]; then
         local compute_idrac_ips=(10.192.168.101 10.192.168.102 10.192.168.103)
-    elif [[ ${FUEL_HOST} == "ash" ]]; then
-        local compute_nodes_domains=($(${FUEL} node list|awk '/compute/{printf "r-%s ",$5}'))
-        local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; do host $i|awk '{print $4}'; done))
-    elif [[ ${FUEL_HOST} == "sea" ]]; then
-        local compute_nodes_domains=($(${FUEL} node list|awk '/compute/{printf "r-%s ",$5}'))
-        local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; do host $i|awk '{print $4}'; done))
+    elif [[ ${DC} == "ash" || ${DC} == "sea" ]]; then
+        local compute_nodes_domains=($(${FUEL} node list | \
+            awk '/compute/{printf "r-%s ",$5}'))
+        local compute_idrac_ips=($(for i in ${compute_nodes_domains[@]}; \
+            do host $i | awk '{print $4}'; done))
     fi
     echo ${compute_idrac_ips[@]}
 }
@@ -186,5 +172,5 @@ if [[ ${#critical_services[@]} -gt 0 ]]; then
     exit $STATE_CRITICAL
 fi
 
-echo "${ALERT_NAME} status OK"
+echo "${ALERT_NAME} OK"
 exit $STATE_OK

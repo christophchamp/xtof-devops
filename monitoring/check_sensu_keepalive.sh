@@ -34,7 +34,6 @@ JENKINS_DASHBOARD="http://jenkins.example.com:8080/view/Openstack-dashboard/"
 JENKINS_ENDPOINT="http://jenkins.example.com:8080/buildByToken/buildWithParameters"
 JENKINS_JOB="${DC}-sensu-receiver"
 JENKINS_TOKEN="<REDACTED>"
-#JENKINS_ISSUE_TYPE="check-sensu-keepalive"
 JENKINS_ISSUE_TYPE=$(echo ${ALERT_NAME} | sed -e 's/\([A-Z]\)/-\L\1/g' -e 's/^-//')
 JENKINS_ALERT_FILE=/etc/sensu/plugins/.jenkins_alerts
 
@@ -60,7 +59,7 @@ usage ()
     echo " -V         Print version information"
     echo " -v         Verbose output"
     echo -e "\nExample:"
-    echo "./${PROGNAME} -H fuel-sea.example.com"
+    echo "./${PROGNAME} -H fuel-seattle.example.com"
 }
 
 # Parse command line options
@@ -102,7 +101,7 @@ fi
 # Start of actual check =======================================================
 
 # We are performing this for-loop in order to convert hostnames from:
-# "us-sea1-c12-n-node1" to "node-25". We are doing this so our Jenkins
+# "use-ash1-c12-n-node1" to "node-25". We are doing this so our Jenkins
 # job can ssh into each node and attempt to self-heal (restart the
 # sensu-client, in this case).
 declare -A host_array
