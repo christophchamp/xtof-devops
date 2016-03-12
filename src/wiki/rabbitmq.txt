@@ -1,0 +1,2 @@
+$ rabbitmqctl list_connections
+$ rabbitmqctl list_connections timeout
