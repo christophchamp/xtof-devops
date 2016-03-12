@@ -1,0 +1,17 @@
+# SEE: http://www.cyberciti.biz/tips/howto-linux-server-memory-check.html
+# ALSO: http://www.cyberciti.biz/faq/linux-how-do-i-find-out-causes-for-memory-faults/
+First find out memory site using free command.
+$ free
+
+Output:
+
+ total       used       free     shared    buffers     cached
+Mem:        768304     555616     212688          0      22012     270996
+-/+ buffers/cache:     262608     505696
+Swap:       979956          0     979956
+
+In above example my server has 768304K memory. Now use dd command as follows:
+$ dd if=/dev/urandom bs=768304 of=/tmp/memtest count=1050
+$ md5sum /tmp/memtest; md5sum /tmp/memtest; md5sum /tmp/memtest
+
+According to him if the checksums do not match, you have faulty memory guaranteed. Read dd command man page to understand all options. dd will create /tmp/memtest file. It will cache data in memory by filling up all memory during read operation. Using md5sum command you are reading same data from memory (as it was cached).
