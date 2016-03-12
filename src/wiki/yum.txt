@@ -1,3 +1,9 @@
 yum whatprovides /usr/bin/automake-1.11
 repoquery -lq openssl|head
 rpm -qa --last
+
+yum -d 0 -e 0 -y list erlang
+
+vim /etc/yum.repos.d/nailgun.repo 
+yum --disablerepo="*" --enablerepo="nailgun" list installed
+yum --disablerepo="*" --enablerepo="nailgun"
