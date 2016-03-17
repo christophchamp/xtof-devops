@@ -4,8 +4,8 @@
 # Sensu plugin to monitor Nova service states                                  #
 ################################################################################
 
-ALERT_NAME="CheckNovaServicesState"
-VERSION="Version 1.0"
+ALERT_NAME="CheckNovaServices"
+VERSION="Version 1.2"
 AUTHOR="Christoph Champ <christoph.champ@gmail.com>"
 
 PROGNAME=$(`which basename` $0)
@@ -19,29 +19,34 @@ STATE_CRITICAL=2
 STATE_UNKNOWN=3
 STATE_DEPENDENT=4
 
+# ANSI escape characters
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+NC='\033[0m' # No Colour
+
 NOVA=/usr/bin/nova
 
 # Which nova services/hosts to ignore
 IGNORE_SERVICES=( 'nova-network' 'nova-console' )
-IGNORE_HOSTS=( 'node-24.example.local' ) # service;host
+IGNORE_HOSTS=( 'node-24.example.local' )
 
 # Helper functions #############################################################
 
 function print_revision {
-   # Print the revision number
-   echo "$PROGNAME - $VERSION"
+    # Print the revision number
+    echo "$PROGNAME - $VERSION"
 }
 
 function print_usage {
-   # Print a short usage statement
-   echo "Usage: $PROGNAME [-v] [-V]"
+    # Print a short usage statement
+    echo "Usage: $PROGNAME [-v] [-V]"
 }
 
 function print_help {
-   # Print detailed help information
-   print_revision
-   echo -e "$AUTHOR\n\nCheck ${ALERT_NAME} cluster operation\n"
-   print_usage
+    # Print detailed help information
+    print_revision
+    echo -e "${AUTHOR}\n\nAlert name: ${ALERT_NAME}\n"
+    print_usage
 
    /bin/cat <<__EOT
 
@@ -56,9 +61,9 @@ __EOT
 }
 
 function print_val {
-  if [[ $verbosity -ge 1 ]]; then
-    echo $1
-  fi
+    if [[ $verbosity -ge 1 ]]; then
+        echo -e "$1"
+    fi
 }
 
 function contains() {
@@ -140,10 +145,10 @@ for service_data in ${service_array[@]}; do
     if ! $(contains "${IGNORE_SERVICES[@]}" "${service}") && \
        ! $(contains "${IGNORE_HOSTS}" != "${host}") && \
        [[ "${enabled}" == "enabled" && "${state}" != "up" ]]; then
-        print_val "CRTICIAL;${service_data}"
+        print_val "${RED}[CRTICIAL]${NC} ${node} ${service} ${enabled} ${state}"
         result[$node_name]+="${service} "
     else
-        print_val "OK;${service_data}"
+        print_val "${GREEN}[   OK   ]${NC} ${node} ${service} ${enabled} ${state}"
     fi
 done
 
@@ -151,7 +156,6 @@ done
 alert_output=""
 DC=$(which_dc) # Get the 3-letter data centre value (e.g., "sea")
 if [[ ${#result[@]} -gt 0 ]]; then
-    print_val "DEBUG: Services found = ${#result[@]}"
     alert_output="{\"payload\":["
     for node in ${!result[@]}; do
         node_name=${node/_/-} # restore hyphens to node name (e.g., "node-1")

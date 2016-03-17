@@ -21,6 +21,10 @@ STATE_CRITICAL=2
 STATE_UNKNOWN=3
 STATE_DEPENDENT=4
 
+# ANSI escape characters
+GREEN='\033[1;32m'
+NC='\033[0m' # No Colour
+
 # Percent packet loss allowed before we trigger alerts
 WARNING_PACKET_LOSS=0
 CRITICAL_PACKET_LOSS=0.99
@@ -43,23 +47,22 @@ JENKINS_ALERT_FILE=/etc/sensu/plugins/.jenkins_alerts
 # Helper functions #############################################################
 
 function print_revision {
-   # Print the revision number
-   echo "$PROGNAME - $VERSION"
+    # Print the revision number
+    echo "$PROGNAME - $VERSION"
 }
 
 function print_val {
-  if [[ $verbosity -ge 1 ]]; then
-    echo $1
-  fi
+    if [[ $verbosity -ge 1 ]]; then
+        echo -e "${GREEN}[DEBUG]${NC} $1"
+    fi
 }
 
-usage ()
-{
+usage() {
     echo "Usage: ${PROGNAME} [OPTIONS]"
     echo " -h         Get help"
     echo " -H <host>  fqdn of fuel host"
     echo " -n <node>  short node name (e.g., node-7)"
-    echo " -j <0|1>   Run Jenkins? 0=no; 1=yes"
+    echo " -j <0|1>   Run Jenkins job? 0=no; 1=yes"
     echo " -V         Print version information"
     echo " -v         Verbose output"
     echo -e "\nExample:"
@@ -94,13 +97,13 @@ do
         *)
             echo "$PROGNAME: Invalid option '$1'"
             usage
-            exit 1
+            exit $STATE_UNKOWN
             ;;
     esac
 done
 
 SSH_PARAMS="-q -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null \
-      -i /etc/sensu/plugins/sensu-key root@${FUEL_HOST} ssh ${CONTROLLER_NODE}"
+    -i /etc/sensu/plugins/sensu-key root@${FUEL_HOST} ssh ${CONTROLLER_NODE}"
 
 # Main #########################################################################
 
@@ -154,6 +157,7 @@ if [[ ${#instance_array[@]} -eq 0 ]]; then
     exit 2
 fi
 
+# Create an array with key => node and values => "vm_name:IP"
 declare -A ip_array
 for instance_data in ${instance_array[@]}; do
     node=$(echo ${instance_data} | cut -d';' -f3)
@@ -194,6 +198,7 @@ done
 
 # We now construct a JSON string from the results of our ping check
 alert_output=""
+n=0
 if [[ ${#result[@]} -gt 0 ]]; then
     print_val "DEBUG: Number of alerts = ${#result[@]}"
     alert_output="{\"payload\":["
@@ -204,6 +209,7 @@ if [[ ${#result[@]} -gt 0 ]]; then
             critical_nodes=1
         fi
         alert_ips=${result[$node]// /,}
+        #id=$(($(date +%s) + ((n++))))
         json="{\"id\":\"${DC}-$(date +%s)\",\"dc\":\"${DC}\","
         json+="\"node\":\"${node_name}\",\"ratio\":\"${ratio}\","
         json+="\"ips\":\"${alert_ips%,}\"},"
@@ -214,8 +220,10 @@ fi
 read -r json_str <<< "${alert_output}"
 
 function create_jenkins_payload() {
-    # This function strips out unneeded JSON key/values and then converts the
-    # payload into base64 as a return string
+    # This function strips out unneeded JSON key/values as well as any ratios
+    # less than 1.0 (i.e., any nodes where not 100% of the instances have
+    # 100% packet loss). It will then convert the payload into base64 as a
+    # return string (with one string per critical node)
     payload="$1"
     payloads=$(
     python - <<EOF
@@ -227,9 +235,12 @@ import simplejson as json
 for key, value in json.loads(os.environ["data"]).iteritems():
     if type(value) == type(['']):
         for sub_value in value:
-            sub_value["ips"]=re.sub(r":100%,?", r" ", sub_value["ips"]).strip()
-            result=json.dumps(json.loads('{"%s":[%s]}' % (key, json.dumps(sub_value))))
-            print base64.b64encode(result)
+            if eval(sub_value["ratio"] + '.') == 1.0:
+                sub_value["ips"]=re.sub(r":100%,?", r" ", sub_value["ips"]).strip()
+                result=json.dumps(json.loads('{"%s":[%s]}' % (key, json.dumps(sub_value))))
+                print base64.b64encode(result)
+            else:
+                continue
 EOF
     )
     echo "${payloads}"
@@ -238,8 +249,8 @@ EOF
 # Exit status with message
 if [[ ${critical_loss} -gt 0 && ${critical_nodes} -gt 0 && ${RUN_JENKINS} -eq 0 ]]; then
     # We arrive here if there are node(s) where 100% of the instances on the
-    # give node(s) have 100% packet loss _and_ our Jenkins "self-heal"
-    # process failed after two attempts.
+    # given node(s) have 100% packet loss _and_ our Jenkins "self-heal" process
+    # failed after two attempts.
     msg="${ALERT_NAME} CRITICAL NODES"
     export data=$(python -c 'import sys; import simplejson as json; \
                data=json.dumps(json.loads(sys.stdin.read()),sort_keys=True,indent=4);\
@@ -251,7 +262,7 @@ if [[ ${critical_loss} -gt 0 && ${critical_nodes} -gt 0 && ${RUN_JENKINS} -eq 0 
     fi
 elif [[ ${critical_loss} -gt 0 && ${critical_nodes} -gt 0 && ${RUN_JENKINS} -eq 1 ]]; then
     # We arrive here if there are node(s) where 100% of the instances on the
-    # give node(s) have 100% packet loss and we are going to submit a job to
+    # given node(s) have 100% packet loss and we are going to submit a job to
     # Jenkins to have it attempt to "self-heal" the issue.
     msg="${ALERT_NAME} CRITICAL NODES"
     export data=$(python -c 'import sys; import simplejson as json; \
@@ -267,8 +278,8 @@ elif [[ ${critical_loss} -gt 0 && ${critical_nodes} -gt 0 && ${RUN_JENKINS} -eq 
     sudo sed -i'' -r 's/('"${JENKINS_ISSUE_TYPE}"')=(.*)/echo \1=$((\2+1))/ge' ${JENKINS_ALERT_FILE}
 
     # If the integer value associated with the key in the dotfile is less than
-    # "2", we have not hit our Jenkins threshold yet (i.e., we will not
-    # send a critical alert to enterprise_monitoring (aka NOC Team).
+    # "2", we have not hit our Jenkins threshold yet (i.e., we will not send a
+    # critical alert to enterprise_monitoring (aka NOC Team).
     if [[ $(awk -F'=' -vjenkins=${JENKINS_ISSUE_TYPE} \
             '$0 ~ jenkins{print $2}' ${JENKINS_ALERT_FILE}) -lt 2 ]]; then
         payloads=($(create_jenkins_payload ${data}))
