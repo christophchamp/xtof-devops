@@ -11,7 +11,7 @@
 
 ALERT_NAME="CheckZooKeeperRuok"
 PROGNAME=$(`which basename` $0)
-VERSION="Version 1.0"
+VERSION="Version 1.2"
 AUTHOR="Christoph Champ <christoph.champ@gmail.com>"
 
 # Exit codes
@@ -24,6 +24,17 @@ STATE_DEPENDENT=4
 NC=$(which nc)
 ZOOKEEPER_PORT=2181
 
+function which_dc () {
+    # This ugly workaround is just to figure out which DC we are in, since the
+    # DNS records are either missing or inconsistent
+    DC=$(getent hosts $(awk '/nameserver/{print $2;exit}' /etc/resolv.conf) | \
+        awk '{print substr($2,1,3)}')
+    if [[ "${DC}" == "fue" ]]; then
+        DC="lab"
+    fi
+    echo ${DC}
+}
+
 raw=($(netstat -plant|awk -F':' '/:'${ZOOKEEPER_PORT}' /{print $8}'))
 
 if [[ $(echo ${#raw[@]}) -eq 0 ]]; then
@@ -31,26 +42,38 @@ if [[ $(echo ${#raw[@]}) -eq 0 ]]; then
     exit $STATE_CRITICAL
 fi
 
-# Get a unique set of ZooKeeper IPs
-zk_hosts=($(tr ' ' '\n' <<< "${raw[@]}" | sort -t . -k 3,3n -k 4,4n -u | tr '\n' ' '))
+# Get a sorted and unique set of ZooKeeper IPs
+zk_hosts=($(tr ' ' '\n' <<< "${raw[@]}" |\
+    sort -t . -k 3,3n -k 4,4n -u | tr '\n' ' '))
 
-# Populate array with results
-declare -A alert_array
+# Create a JSON output/payload string
+critical=0
+json_str="{\"payload\":["
+DC=$(which_dc) # Get the 3-letter data centre value (e.g., "sea")
+n=0
 for zk in ${zk_hosts[@]}; do
-    node=$(getent hosts $zk|awk '{print $3}');
+    id="${DC}-$(($(date +%s) + ((n++))))"
+    node=$(getent hosts $zk | awk '{print $3}')
     if [[ $(echo ruok | ${NC} -n -w 2 $zk ${ZOOKEEPER_PORT}) == "imok" ]]; then
-        alert_array["ok"]+="${node} (${zk});"
+        json_str+="{\"dc\":\"${DC}\",\"id\":\"${id}\","
+        json_str+="\"node\":\"${node}\",\"ip\":\"${zk}\",\"status\":\"imok\"},"
     else
-        alert_array["critical"]+="${node} (${zk});"
-        echo "CRITICAL: $zk";
-    fi;
+        critical=1
+        json_str+="{\"dc\":\"${DC}\",\"id\":\"${id}\","
+        json_str+="\"node\":\"${node}\",\"ip\":\"${zk}\",\"status\":\"dead\"},"
+    fi
 done
+json_str="${json_str%,}]}"
+payload=$(echo "${json_str}" | python -mjson.tool)
 
 # Exit status with message
-if [[ ${#alert_array["critical"]} -gt 0 ]]; then
-    echo "${ALERT_NAME} CRITICAL: ZooKeeper is not responding on midonet-gw nodes: {${alert_array["critical"]}}"
+if [[ ${critical} -gt 0 ]]; then
+    msg="${ALERT_NAME} CRITICAL: ZooKeeper is not responding on midonet-gw "
+    msg+="nodes: ${payload}"
+    echo "${msg}"
     exit $STATE_CRITICAL
 else
-    echo "${ALERT_NAME} OK: ZooKeeper is responding on midonet-gw nodes: {${alert_array["ok"]}}"
+    msg="${ALERT_NAME} OK: ZooKeeper is responding on midonet-gw nodes:"
+    echo "${msg} ${payload}"
     exit $STATE_OK
 fi
