@@ -33,8 +33,7 @@ STATE_CRITICAL=2
 STATE_UNKNOWN=3
 STATE_DEPENDENT=4
 
-usage ()
-{
+usage() {
     echo "Usage: $0 [OPTIONS]"
     echo " -h             Get help"
     echo " -H <Auth URL>  URL for obtaining an auth token"
@@ -43,31 +42,22 @@ usage ()
     echo " -T <seconds>   Time, in seconds, to wait for a reply (integer value only)"
 }
 
-while getopts 'h:H:U:P:T:' OPTION
+while getopts 'hH:U:P:T:' OPTION
 do
     case $OPTION in
-        h)
-            usage
-            exit 0
-            ;;
-        H)
-            export OS_AUTH_URL=$OPTARG
-            ;;
-        U)
-            export OS_USERNAME=$OPTARG
-            ;;
-        P)
-            export OS_PASSWORD=$OPTARG
-            ;;
-        T)
-            export MAX_TIME=$OPTARG
-            ;;
-        *)
-            usage
-            exit 1
-            ;;
+        h)  usage; exit 0 ;;
+        H)  export OS_AUTH_URL=$OPTARG ;;
+        U)  export OS_USERNAME=$OPTARG ;;
+        P)  export OS_PASSWORD=$OPTARG ;;
+        T)  export MAX_TIME=$OPTARG ;;
+        *)  usage; exit 1 ;;
     esac
 done
+if [ $OPTIND -eq 1 ]; then
+    echo "No options were passed";
+    usage
+    exit 0
+fi
 
 if ! which curl >/dev/null 2>&1; then
     echo "${ALERT_NAME} UNKNOWN: curl is not installed."
@@ -83,7 +73,7 @@ START=$(date +%s)
 TOKEN=$(curl -d '{"auth":{"passwordCredentials":{"username":"'$OS_USERNAME'","password":"'$OS_PASSWORD'"}}}' \
              -H "Content-type: application/json" \
              ${OS_AUTH_URL}:5000/v2.0/tokens/ 2>&1 | \
-             \grep token|awk '{print $8}'| \grep -o '".*"' | \
+             awk '/token/{print $8}'| \grep -o '".*"' | \
              sed -n 's/.*"\([^"]*\)".*/\1/p')
 END=$(date +%s)
 
