@@ -40,3 +40,6 @@ mysql
 numpy
 matplotlib
 pandas
+lynx
+w3m
+html2text
