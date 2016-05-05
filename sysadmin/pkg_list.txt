@@ -20,6 +20,8 @@ wireshark
 sshpass
 dsh
 pssh
+ipcalc
+sipcalc
 tree
 imagemagick
 jq
