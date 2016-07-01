@@ -45,3 +45,4 @@ pandas
 lynx
 w3m
 html2text
+xsel
