@@ -46,3 +46,8 @@ lynx
 w3m
 html2text
 xsel
+guake
+tmux
+slack
+irssi
+conky
