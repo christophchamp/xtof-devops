@@ -14,6 +14,8 @@ htop
 ntop
 ngrep
 netcat
+netsed
+socat
 telnet
 nmap
 wireshark
@@ -48,6 +50,7 @@ html2text
 xsel
 guake
 tmux
-slack
 irssi
 conky
+pianobar
+http://www.roe.ch/SSLsplit

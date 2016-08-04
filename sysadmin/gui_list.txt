@@ -1,0 +1,8 @@
+https://github.com/telegramdesktop/tdesktop
+VirtualBox
+VMware
+HipChat
+Slack
+VLC
+Dropbox
+HexChat
