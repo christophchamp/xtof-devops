@@ -1,5 +1,6 @@
 #!/bin/bash
 # AUTHOR: Christoph Champ <christoph.champ@gmail.com>
+# DESCRIPTION: Gets a list of OpenStack availability zones
 # Requires jq 1.5+
 JQ=$(which jq)
 
