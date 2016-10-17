@@ -3,3 +3,4 @@ awscli
 pyrax
 parsedatetime
 gcalcli
+mycli
