@@ -4,3 +4,5 @@ pyrax
 parsedatetime
 gcalcli
 mycli
+ipython
+ansible
