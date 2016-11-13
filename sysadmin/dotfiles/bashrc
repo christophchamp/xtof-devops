@@ -107,6 +107,20 @@ netinfo ()  # Shows ip/mac/router address, etc.
     echo Current IP Address: $(curl -s ${URL} | grep -o "[[:digit:].]\+")
     echo "---------------------------------------------------"
 }
+function countdown(){
+   date1=$((`date +%s` + $1)); 
+   while [ "$date1" -ge `date +%s` ]; do 
+     echo -ne "$(date -u --date @$(($date1 - `date +%s`)) +%H:%M:%S)\r";
+     sleep 0.1
+   done
+}
+function stopwatch(){
+  date1=`date +%s`; 
+   while true; do 
+    echo -ne "$(date -u --date @$((`date +%s` - $date1)) +%H:%M:%S)\r"; 
+    sleep 0.1
+   done
+}
 
 extract() { 
     if [ -f $1 ] ; then 
