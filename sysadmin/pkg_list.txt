@@ -54,3 +54,4 @@ irssi
 conky
 pianobar
 http://www.roe.ch/SSLsplit
+http://mkchromecast.com/
