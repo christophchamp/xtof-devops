@@ -190,3 +190,7 @@ then
 else
     export PS1="$PS1"'\$ '
 fi
+
+##== Bash Completion ==
+source <(kubectl completion bash)
+source <(minikube completion bash)
