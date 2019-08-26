@@ -397,6 +397,7 @@ gpg --gen-random --armor 1 8  # generate a random password n characters long
  -> pwgen 8 1
  -> cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 8
  -> openssl rand -base64 8
+ -> openssl rand -hex 10
  -> python -c 'import string,random;print "".join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(16))'
 echo $(cat /dev/urandom | base64 | tr -d "=+/" | dd bs=32 count=1 2> /dev/null) # create generic token following GCE standard
  -> dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null
@@ -944,7 +945,7 @@ sudo shutdown -h 60 & mpg123 ambientmusic/*.mp3 # Play music for 60 minutes and 
 less +F filename.log # Using +F option or pressing F in less is similar to `tail -f filename.log` but can use less's features
 :set paste # In vim, when you want to paste in code, its often useful to 'set paste' so that the autoindent/syntax doesn't interfere
 vi macro: qajjddq # Record a macro called 'a' that moves down two lines (jj) and then deletes 1 line (dd). Run w/ @a, run 100 times 100@a
-curl -4 http://wttr\.in/
+curl -4 http://wttr\.in/ # weather
 find . -empty -type d # List of empty subdirectories of current directory
 diff <(openssl rsa -in my.key -modulus | grep Modulus) <(openssl x509 -in my.crt -modulus | grep Modulus) # Check if cert was signed by key
 alias hideprev='history -d $((HISTCMD-2)) && history -d $((HISTCMD-1))' # Hide the previous command you just ran and forgot to use space
@@ -955,4 +956,476 @@ ionice -c 3 cp vm1.img vm1-clone.img # Copy a file using "ionice -c 3" to give i
 fdupes -r dir > dupes.txt # Find file duplicates in 'dir' recursively based on size and mdsum and log to dupes.txt
 awk -F: {'print $1 ":" $2'} messages |uniq -c # Count syslog hits per minute in your messages log file. Useful for doing quick stats
 todo(){ cd ~/.todo||return 1&& l=$(ls -1t|head -n1)&&t=$(date +%Y%m%d);[[ "$1" == "last" ]]&&cp $l $t; ${EDITOR:-vi} $t;cd -;} # Todo list
+for i in $(seq 4 65);do echo -n "${pi:0:$i}.com: ";whois ${pi:2:$((i-2))}.com|grep --col=no "rant Na"||echo;sleep 5;done #pi domain owners
+pi=$( echo "scale=1000;4*a(1)" | BC_LINE_LENGTH=1004 bc -l ) # Happy Pi Day! Calculate π to 1000 digits using bc and assign it to pi
+convert -size 413x314 xc:tan -fill red -pointsize 200 -gravity center -draw "text 0,0 '3.14'" -flop pie.png # Req. ImageMagick #pi #piday
+Tip: Sending a Ctrl-| (SIGQUIT signal) to a running ping command in Linux will print out brief summary output. Try Ctrl-T on BSDs.
+ps ax -o state -o ppid | awk '$1=="Z"{print $2}' | xargs kill -9 # Kill all #zombies on the system
+tail -f /dev/ttyACM0 |gawk '{print strftime("%Y-%m-%d %T") " " $0)}' |tee temperature.log # Arduino temp sensor to timed logfile and view
+echo ${USER:0:${#USER}/2} # You can use arithmetic inside bash variable expansions, such as this to get the first half of your username
+touch -r oldfile newfile # set access/modification times of newfile to those of oldfile
+t=$((COLUMNS*LINES-COLUMNS));r=$((RANDOM%t));printf "\e[32m";for i in $(seq $t);do [[ $i == $r ]]&&printf "🍀"||printf "☘";done # find 4-leaf
+ls -ld ???? # Long list the files/directories with only 4 characters by using 4 match any single character patterns (?)
+echo ｙoυrｂａｎｋ.com | hexdump -c # Check a domain to make sure its all the ASCII characters you expect and not Unicode look-a-likes
+yes "$(seq 231 -1 16)" | while read i; do printf "\x1b[48;5;${i}m\n"; sleep .02; done # A rainbow in your shell
+lsof -Pan -i tcp -i udp # Show all programs listening TCP/UDP ports. You may want to run this with superuser privileges
 
+==April 2016==
+find /usr -name '*.wav' -size -75>snds;for i in $(seq 1 13 600);do at "now + $i minute" <<<'play "$(shuf snds|head -1)">/dev/null 2>&1';done
+for f in *.mp4; do echo "processing $f"; bname=$(basename $f); ffmpeg -i "$f" "$bname.wav"; done # Convert MP4 to WAV
+sudo bash -c 'swapoff -a && swapon -a' # After killing processing using up all your RAM on Linux (Firefox!!), move processes off of swap.
+sudo fdisk -l /dev/sd? # Show partitions of only physical SCSI/SATA/SCA drives and not other things like device mapper entries.
+n=({A..G}{2..6});r=$((RANDOM%${#n[*]}));play -qn synth pl ${n[$r]} trim 0 1;read -p "[A-G]?" g;[[ "$g" == "${n[r]:0:1}" ]]&&echo y||echo n
+tail -f /dev/ttyACM0 |gawk '{print strftime("%Y-%m-%d %T") " " $0)}' |tee temperature.log # Arduino temp sensor to timed logfile and view.
+HEAD -E https://www.raspberrypi.org/
+http://fretmap.com
+for i in *.jpg;do printf "$i %s\n" $(convert "$i" -scale 1x1\! -format '%[pixel:u]' info:- ) ;done |tee -a color-indexes.txt # Major colors
+watch -n 0.5 "ps uf -C process1,process2" # Continually watch processes with names
+timeout 1h tcpdump -n -i eth0 -w network.pcap not host 192.168.1.5 # Use timeout to only run a command for a set amount of time (1hour)
+[Meta-.] # Live insert the last word from the previous command in history into current line. Can repeat to go further. Not the same as !$.
+~.[Enter] # If SSHd two-levels deep and host goes down, this will get you out of the host
+while :;do rec -t raw /dev/null rate 32k silence 1 0.1 2% 1 0.0 2% && ping -c 1 home;sleep 1; done # Ping home when mic "hears" something.
+for i in *.jpg;do printf "$i %s\n" $(convert "$i" -scale 1x1\! -format '%[pixel:u]' info:- ) ;done |tee -a color-indexes.txt # Major colors
+PROMPT_COMMAND="play -qn synth sin G3 trim 0 0.1" # Audio prompt. Could also use different notes/melodies for various return codes.
+curl -H "Host: http://www.example.com " http://example.climagic\.org/config.php # Change the host header to bypass the DNS.
+exiftool -all= foo.jpg # Remove all exif metadata from a photo
+oneworld=$( curl -Ls http://bit\.ly/globe_vt );while sleep .1;do pv -L4220 -q <<<"$oneworld";done # ASCII globe animation
+curl -sr 0-1024 www.nasa\.gov/images/content/618486main_earth_full.jpg |strings # View image metadata without downloading whole 16MB image
+:n and :p # When using multiple file arguments with less or vi, you can use :n and :p to go next file (n) and prev file (p) in list.
+script /tmp/unix-session.log # session logger
+
+==May 2016==
+sudo mlabel -i /dev/sdg1 -s ::"Backups" # Rename the filesystem label on a USB thumb drive to Backups
+last -da | grep -vE "^(root|reboot|asmith) " # See the last logged in users, but filter out entries for root, reboots and asmith.
+man dpkg | sed -n '/Doctal/,/2000 /p' # Pipe the output of the man command into other commands to trim down the "insane amounts of drivel"
+strace -e open openssl s_client -crlf -quiet -starttls smtp -connect smtp.example\.com:25 # Use strace to show the files openssl is opening.
+
+echo 1.01^365|bc -l => 37.8
+echo 0.99^365|bc -l => 0.03
+
+echo $(( ( $( date +%s ) - $( date -d "now - 7 years" +%s ) ) /86400 )) # Calculate 7 years ago in days, accounting for leap years
+find . -xdev -type f -mtime +$((365*7)) -print0|xargs -0 du -bsc|awk '/\ttotal$/{s+=$0}END{print s}' # Total bytes of files older than ~7 yr
+sudo lsof +D /var/lib/apt/lists # Show what files or filehandles are open in the specified directory
+mplayer -vf rotate=1 video.mp4 # Rotate a video taken by a "smart"phone user 90 degrees CW. Or just for fun. Try rotate=2 for CCW
+exiftool <(curl -s apod.nasa\.gov/apod/image/1605/NGC5078-LRGBhager2048.jpg) |grep Software # See what software was used for an image
+
+==June 2016==
+(espeak || say || cat) <<<No
+curl wttr\.in/Moon # See the current phase of the moon in your terminal. New feature of wttr.in
+echo "fuzzbuzz" | sed -e 's/u/i/2' # Replace the 2nd occurrence of a regex match
+elinks -dump bit\.ly/qutWZK|tr -d ,|sed -e '/^2014/q'|awk '/^[12]/{p=$6/$2*100; printf "%d %0.4f%%\n",$1,p}' # % US pop. murdered 1960-2014
+o="-vvvvvv";for i in 0 {2..7}; do c="aptitude ${o:0:$i} moo";echo "$ $c"; $c; done # Discover the Super Cow Powers of aptitude
+grep -Ev "((accept|drop|reject)log|ftpd)" /var/log/messages | less # Yes! You can do nested grouping in extended regexes
+powertop # Will show you the top power consuming processes on your Linux laptop.
+fatrace
+dig RandomDomainNameThatDoesNotExistLLC\.com @4.2.2.2
+
+==July 2016==
+awk -F, '{sqrt($4^2)}' data.csv # Get the absolute value of the 4th column of numbers using the square root of the square trick.
+ -> echo "1,2,3,-4,5" | awk -F, '{print sqrt($4^2)}';
+stdbuf -i0 -o0 ping 8.8.8.8 | while read l; do echo "[$(date '+%H:%M:%S')] $l"; done # Prefix lines with timestamp.
+tail -f access.log | stdbuf -oL cut -d ' ' -f1 | uniq # This will immedidately display unique entries from access.log
+head -1 data.csv | tr , $'\n' | nl # Print the number and column name to help write awk expressions.
+xmodmap -e "remove Lock = Caps_Lock" -e "keycode 66 = Escape" # In X, use xmodmap to turn your Caps Lock into an Escape key
+echo "scale=1000;4*a(1)*2" | BC_LINE_LENGTH=1004 bc -l | cut -c1-629 # Happy Tau (τ) day!
+curl -I http://langs.eserver\.org/latin-terms.txt | grep Last-Modified # Check the last modified date of a file on a web server.
+scrot # screen capture
+t=$(($(tput cols)/3));for FR in $(seq $(tput lines));do printf "\e[44m%${t}s\e[47m%${t}s\e[41m%${t}s\e[0m\n";done # French Flag
+sudo tcpdump -l icmp[icmptype]=icmp-echo | awk '{if (!arr[$3]){print $3;arr[$3]++}}' # Show new pingers. -l makes tcpdump linebuffered
+n=0;while : $((n++));do printf "%0${n}d"|grep -qP "^0?$|^(00+?)\1+$"||echo $n;done #Find primes w/ PCRE
+scanimage --format=tiff --mode Color | convert tiff:- ~/Scans/$(date "+%Y-%m-%d_%H:%M:%S").jpg # Scan directly w/ cur date
+usps_status(){ elinks -dump tools.usps\.com/go/TrackConfirmAction?qtc_tLabels1=$1 |sed -n '/Status of Item/{n;p;q}'; } # Shipment status
+awk '$9!~/^[23]/{print $4}' access_log | cut -c1-12 | uniq -c # Show the number of UNsuccessful requests per day. (Not HTTP code 2XX or 3XX)
+find . -name '*s_log*'|xargs cat|sort -k4n -t' ' -k 4.9,4.12n -k 4.5,4.7M -k 4.2,4.3n -k 4.14,4.15n -k 4.17,4.18n -k 4.20,4.21n >mergedlogs
+find /var/www -perm -o+w -a -not -type l -ls # Find files and directories under /var/www that are world writable. Exclude symbolic links.
+echo epoch day $(( $( date +%s ) / 86400 ))
+curl -s http://www.coindesk\.com/price/ |grep bpiUSD |sed 's/<\/\?[^>]\+>//g' |tr -d " \t\r" #bitcoin prices in USD
+*/3 * * * * if [[ -z $(pgrep offlineimap) ]]; then offlineimap -u quiet; fi # run a cron script only if it is not already running
+find . -name \*.[ch] -exec grep -sl "PATTERN" {} \; # Search for PATTERN in .c and .h file
+find / -type f | sed 's,/[^/]*$,,' |sort |uniq -c | awk '$1>=33000' # Find directories that have 33000 or more files in them
+^-l^^ # If you just ran a command like unzip -l http://archive.zip  to see the contents, you can use ^-l^^ to run again without the -l
+
+==August 2016==
+(echo 'GET /'; echo; sleep 1; ) | telnet www.google.com 80
+ -> /usr/bin/printf 'GET / \n' | nc www.google.com 80
+youtube-dl -q -o- _gp51lt9kdA|mplayer -wid $(xwininfo -int -name "Desktop"|grep "Desktop"|awk '{print $4}') -cache 5000 - # Video background
+ -> https://www.youtube.com/watch?v=_gp51lt9kdA
+*/3 * * * * if [[ -z $(pgrep offlineimap) ]]; then offlineimap -u quiet; fi # run cronjob only if it is not already running
+
+==September 2016==
+sed -i -e '/^\s*#/!s/$val\>/$pid/g' getproc.pl # Replace all variables $val with $pid in getproc.pl, except on commented lines
+find . -atime -$(date +%j) -type f # Find files you haven't accessed so far this year in a directory. Requires atime attributes.
+egrep -oi '#[a-f0-9]{6}' file.css | sort | uniq # extract all unique hex color codes from a CSS fil
+for i in {1..20} ; do rig|head -1 |tr A-Z a-z;done |while read f l;do echo ${f:0:1}${l}:$(pwgen 12 1);done # Gen 20 random users/passwords
+egrep -o "from=<[^>]+\.[a-z0-9-]{2,}>" /var/log/maillog |awk -F\. '{print $NF}' |sort |uniq -c |sort -rn |head -20 # .Top 20 email From TLDs
+
+function json_escape(){
+  echo -n "$1" | python -c 'import json,sys; print json.dumps(sys.stdin.read())'
+}
+$ json_escape "ヤホー"
+"\u30e4\u30db\u30fc"
+
+echo "{'payload': {'message': '$(git log -n 1 --format=oneline | grep -o ' .\+')'}}" >  git-tmp.txt
+curl -i -X POST \
+  -H 'Accept: application/text' \
+  -H 'Content-type: application/json' \
+  -d @git-tmp.txt \
+  'https://example.com'
+
+==October 2016==
+echo $(hostname) `cat /proc/loadavg | cut -f1 -d" "` `getconf _NPROCESSORS_ONLN`
+ -> https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-nats-on-ubuntu-16-04
+df -hP | awk 'NR==1;NR>1{print|"sort -k5rn"}' # Sort the output of df while keeping the header at the top
+awk 'length > max { max=length;maxline=$0 } END { print maxline; }' quotes.txt # Print the longest line in quotes.txt
+awk '!a[$0]++' file # Print lines of file without printing ones already seen. $0 means whole line in awk. 'a' is an array.
+sort gkwzFruP.txt | awk '{if(l1==$1 && l3!=$3){print ll "\n" $0}; ll=$0;l1=$1;l3=$3}' # Print dupes where the 3rd column changed
+awk -F':' '!max{max=$2;}{r="";i=s=.025*$2/max;while(i-->0)r=r"-";printf "%40s | %4d | %s %s",$1,$2,r,"\n";}' # Histo gen
+awk '{s+=$3} END {print s}' data.txt # Sum numbers in the third column of data.txt
+awk '($3 == "64.39.106.131") || ($1 ~ /^#/)' conn.log # Search 3rd field of conn.log for an IP and print the header line
+zcat large.log.gz |awk '{print $0 | "gzip -v9c > large.log-"$1"_"$2".gz"}' # Breakup compressed log by syslog date and recompress
+tcpdump -nn ip | awk '{s=$3;sub(/\.[0-9]+$/,"",s);if(a[s]++<10){print}}' # Show only up to the first 10 packets by each source IP
+tail -f udp.log|gawk '{printf("%s %s\n",strftime("%Y-%m-%d_%T", $1),$0)}' # Prefix the epoch time in column 1 with the local time
+strings /usr/lib/sudo/sudoers.so |grep Dave -B0 -A50 # Display sudo's insults
+mping(){ ping $@|awk -F[=\ ] '/time=/{t=$(NF-1);f=2000-14*log(t^18);c="play -q -n synth 1 pl "f"&";print $0;system(c)}';} # mping nic.uz
+rec -n stat trim |& awk '/Max.*amp/{if ($NF < 0.99){exit 1}}' && xscreensaver-command -lock # Fire alarm will now lock your screen
+mendex
+yes $COLUMNS $LINES|awk 'BEGIN{x=y=e=f=1}{if(x==$1||!x){e*=-1};if(y==$2||!y){f*=-1};x+=e;y+=f;printf "\033[%s;%sH",y,x;system("sleep .02")}'
+awk -F, '/USC00120784/{print substr($6,0,4)}' weather.csv |uniq -c |awk '$2%4==0&&$1<366||$2%4!=0&&$1<365' # Find incomplete years in data.
+
+==November 2016==
+ps auxww | grep -o "/[^\ ]*" Show some full file paths referenced in the process table to try to find out where systems are storing data
+diff -y <(cal -y 2016) <(cal -y 2017) # Two year cal display using diff side-by-side mode (-y)
+ -> paste <(cal -y 2016) <(cal -y 2017) | expand -t70
+vim macro: qajjddq # Record a macro called 'a' that moves down two lines (jj) and then deletes 1 line (dd). Run w/ @a, run 100 times 100@a
+:set bg=dark or :set bg=light # In vim, depending on your term color scheme, these can help you w/ syntax highlighting
+diff <(docx2txt < agreement.docx) <(docx2txt < newagreement.docx) # Did they really only change what they say they did?
+curl -sI bit\.ly/gevpxbegerng |awk -F/ '/^Location:/{print $NF}' |(base64 -di||base64 -Di) # Decode message embedded in redirect
+awk '{if(NF==8){print $2}else if(NF==9){print $2 " " $3}}' names.txt # Try to handle the case where a space is in 2nd column data
+printf "%s\n" {A..Z} | nl | grep "[XKCD]" | awk '{sum+=$1} END {print sum}' # The hidden meaning of xkcd (aka "42")
+curl -L bit\.ly/moonbox |convert - -fill none -stroke red -strokewidth 2 -draw "rectangle 76,97,1360,352" - |display - # Help compare sizes
+for d in {1..254};do ping -c3 10.3.0.5 > /dev/null ||{ echo "VPN is down";break; }; nmap -T1 10.3.0.$d ; done # Check net before slow scan
+vim> [Ctrl+K] a:
+ -> :digraphs
+traceroute 8.8.8.8|awk -F[\(\)] '$2~/[0-9]/{print $2}'|while read i;do echo $i;geoiplookup $i;done # Who can see your 8.8.8.8 requests?
+
+==December 2016==
+identify -format %k http://i.imgur.com/M4zoxE7.jpg  # Count unique colors in an image
+rsync -aqzH (public mirror that supports rsync).???::CentOS /path/to/locate/mirror # Build a private mirror of the public mirror.
+find . -maxdepth 1 -iname '*.mp3' -exec eyeD3 -G podcast \{} \; # tag all mp3 in PWD as genre podcast
+nnoremap / /\v # Add this to .vimrc and all searches in vim will use "very magic" mode which acts like egrep
+sleep 5;while IFS=, read {a..z};do for col in a c d;do xdotool type ${!col} $'\t';sleep 0.3;done;done # Type 3 CSV cols to Google docs table
+base64 -d<<<TVRoZAAAAAYAAQABAYBNVHJrAAAAOgD/UQOAAAAAkEV/CIBFfwCQRX8IgEV/AJBKfwiASn8AkEx/CIBMfwqQSX8IgEl/AJBKfwiASn//LwA=|timidity - # Log!
+identify -format "%f F:%[EXIF:Flash]\n" *.jpg | egrep " F:(0|16|24|32)$" # Show photo filenames where no flash was used. Req. Imagemagick
+strace -p 927 -o smtpd -ff -tt # strace is a sysadmin godsend. This will follow pid 927 and its children, writing to smtpd.<pid>
+[Ctrl-R] % # While in #vim insert mode, insert the filename of the current file into the buffer or vim command prompt
+:noh # This vim command will turn off the current search highlighting until the next search. Use :set hlsearch to turn on
+printf "%x\n" {1..65535} | while read -r u ; do printf "\033[38;5;$((16+$((16#$u))%230))m\u$u\033[0m"; done # Make a Unicode rainbow
+for((I=0;J=--I;))do clear;for((D=LINES;S=++J**3%COLUMNS,--D;))do printf %*s.\\n $S;done;sleep 1;done
+rec -t wav - | ssh user@remotehost play -t wav - # Play local microphone on remote machine's speakers. Fun for pranks. Uses sox package
+socat -v UDP-LISTEN:8161,fork TCP:localhost:8161 # Encapsulate UDP packets in a TCP stream so it can be tunneled through an SSH tunnel, etc
+yes $COLUMNS $LINES|pv -qL50|perl -ne'$|=1;($c,$r)=split;$s||=$"x($c*$r);print$s;$s=$"x$c.$s;substr$s,rand$c,1,"*";$s=substr$s,0,$c*$r+$c;'
+nmap --open -p T:22 192.168.1.0/24 # Scan your internal network for hosts listening on TCP port 22 (SSH protocol)
+function box() { t="$1xxxx";c=${2:-=}; echo ${t//?/$c}; echo "$c $1 $c"; echo ${t//?/$c}; } # Make box around text
+awk '{a[$1] += $10} END {for (h in a) print h " " a[h]}' access_log | sort -k 2 -nr | head -10 # Display top bandwidth hogs on website
+convert -size 500x300 xc:white -fill xc:'#CABB1E' -draw "polygon 35,140 115,130 150,55 310,55 350,130 460,150 460,210 35,210" cabbie.png
+display -size 300x400 -negate xc:'#C0FFEE' # The inverted color of #C0FFEE looks like coffee
+
+==January 2017==
+libreoffice --headless --invisible --convert-to pdf *.ppt
+yes "$(seq 16 231)" | while read i; do printf "\x1b[48;5;${i}m\n"; sleep .02; done # A color show in your shell.
+pv bigdump.sql.gz | gunzip | mysql # restore a #mysql dump with progressbar and ETA
+find /var/log -readable -ls # Find files under /var/log that are readable by the current user. Takes groups and ACLs into account
+mogrify -resize 1080x1350 -gravity center -extent 1080 *.jpg # Fix image aspect ratios for Instagram
+while true;do iwlist wlan0 scan |awk -F\" '/ESSID/{print $2}' |espeak;done # Your laptop says ESSID names while you drive around
+find / \( -path /proc -o -path /sys \) -prune -o -print # Search the file system, but don't descend into the /sys or /proc directories
+N=$((1894 * 238291));for i in {0..8};do echo -e "\e[3${N:${i}:1}m$(echo REBBZ ERYLG LENZ|tr A-Z N-ZA-M|rev)\e[0m";done #That 70s shell
+acronym(){ elinks -no-numbering -dump "http://acronymfinder.com/ ${1:-RTFM}.html"|sed -n '/Rank Abbr/,/^$/p'; } # Ex "acronym FBI"
+convert -size 2420x1580 plasma:fractal -blur 2x2 -swirl 270 -crop 1920x1080+250+250 swirlbg.png # Swirly plasma background. Uses ImageMagick
+printf "2017-01-14 + %d weeks\n" {1..50} |date -f- +"%B %_d" # Print the dates for all the following Saturdays in 2017 for use in a document
+
+==February 2017==
+curl dict://dict.org/d:bash:foldoc
+BC_LINE_LENGTH=0 bc <<<"2^4096" # Perform arbitrarily large math, while disabling bc's \ + newline output "feature"
+date -d "$(stat -c %y /etc/passwd)" +%s.%N # Show the full last modified epoch time including nanoseconds of /etc/passwd (GNU version)
+dd if=/dev/mem bs=1k skip=768 count=256 2>/dev/null | strings -n 8 # Read the BIOS on PC hardware
+tr -cd , < file.txt | wc -m # Count the number of commas (,) in a text file.
+printf "This is @climagic's %dth tweet. Thank you to my %d followers.\n\e[32m===,=='===\e[31m@\e[0m\n" $((10**4)) $((2**17))
+mv image-file-with-query-string.jpg{?query-string=Z29vZCBqb2IK,} # Getting rid of query string in filename by surrounding it with {,}
+sudo strings /dev/sdc | grep -C200 "Received: " # Look for email data on a hard drive, even if it was "deleted". Encrypt your FS!
+elinks -dump bit\.ly/qutWZK|tr -d ,|sed -e '/^2015/q'|awk '/^[12]/{p=$6/$2*100; printf "%d %0.4f%%\n",$1,p}' # % US pop. murdered 1960-2015
+convert bluethumb.png -modulate 100,100,50 greenthumb.png # Change the hue of an image by -90 degrees. 50 = ( -90 * 100/180 ) + 100
+sed -E ':a /.{80}/!{s/^/ /;ba}' file
+printf "%d\n" "')" # Print the decimal encoded value of a ). The ' before the character tells printf to interpret the character this way.
+rtcwake -m mem -s 3600; ffplay alarm.mp3 # Put laptop to sleep for an hour, then play alarm
+cd /etc;n=CAGBFDEC;stat -c%a *|while read -n1 k;do x=${n:$k:1};sleep .2;play -qn synth tri ${x}4 fade 0 .1937&done # Happy 80th Philip Glass
+mplayer -fs -noborder -fixed-vo *.mp4 # Full screen seamless play your mp4 videos without borders. No window switching.
+x=0;y=0;while [[ $y -lt 500 ]] ; do xdotool mousemove --polar $x $y ; x=$(($x+4));y=$(($y+1)); sleep 0.01; done # Move mouse in spiral.
+date -d"2009-12-15 +2600 days"||date -v2009y -v12m -v15d -v+2600d; play -n synth sin 2600 trim 0 1 vol .05 # Today is day #2600 of climagic.
+inotifywait -e open juicy.dat && w | awk '$5~/\.00s/' | mailx -s "Someone accessed juicy.dat" you@example.com # Catch a snooper.
+N=$((1894 * 238291));for i in {0..8};do echo -e "\e[3${N:${i}:1}m$(echo REBBZ ERYLG LENZ|tr A-Z N-ZA-M|rev)\e[0m";done #That 70s shell
+last -da | awk '{print $1 " " $NF}' | sort | uniq -c # Analyze your whole lastlog to see the different remote hosts for each user.
+https://cmdchallenge.com/
+
+==March 2017==
+for x in {8,9,{A..F}}{{0..9},{A..F}} ; do printf "$x %c\n" $( xxd -r <<<"0 $x" ) ; done # Print the extended ASCII table
+strace -s8192 -o evincetrace -ff evince file.pdf # Do an strace of evince and write all syscalls to logfiles even if it forks.
+awk '$1==$2' columns.txt # Print lines from columns.txt where the first column is the same as the second column.
+printf "%s\n" 10.0.{1..4}.{1..254} > network-ips.txt # Fill a file with a range of IPs from 10.0.1.1 - 10.0.4.254, one IP per line.
+grep 10.50.60.70 logs.txt | cut -f1 | sed 's/^/@/' | date -f - # For lines with a specific IP in them, convert the epoch times to dates
+date -d "$(stat -c %y /etc/passwd)" +%s.%N # Show the full last modified epoch time including nanoseconds of /etc/passwd (GNU version)
+rot13 <<<"hello"
+at 12:17pm <<<"echo testing >/tmp/foobar"
+echo "foobar" | openssl dgst -sha256 -hmac "123456" -binary | base64
+sed -E 's/\.(^M?)/\1/' testfile # Ctrl+V Ctrl+M
+
+==April 2017==
+convert -size 150x100 xc:white -fill red -draw 'circle 75,50 75,75' flagofjapan.png # Make the flag of Japan with ImageMagick.
+ping -c100 4.2.2.2 | sponge | pee head tail # The pee command can run head and tail on same input. sponge waits for all the data first.
+locate --regex '\.c$' | shuf | head -1 | xargs pv -q -L 20 # Poor man's hacker typer in the terminal.
+last -da|cut -c27-30|uniq|awk -v y=$(date +%Y) '{if(/Jan/){print $0;print "-- " y--}else{print}}' # Jeez, how far back do these lastlogs go?
+du -h -d 2 ~ | awk '$1 ~ /G/' # show folders 2 levels deep over 1GB in the current user's home folder.
+cp -av /olddisk /newdisk # Copy files (cp) and preserve their timestamps and permissions (-a) while showing what is happening (-v).
+socat TCP-LISTEN:8080,reuseaddr,fork 'EXEC:docker exec -i container "socat STDIO TCP-CONNECT:localhost:8080"'
+convert 1.jpg <( curl http://wttr.in/Oymyakon_tqp0.png ) -geometry +50+50 -composite 2.jpg 
+http://www.climagic.org/coolstuff/tron-etch-a-sketch.html
+nc -k -l 4444 # Starts a WebSocket server and prints all requests to stdout
+rpm -qa --queryformat "%-47{NAME} %{PACKAGER}\n" # Generate list of installed RPM names(left align) and their packager in formated columns.
+
+==May 2017==
+zforce - force a '.gz' extension on all gzip files
+getconf -a | sort -k2nr | grep MAX # Know your limits
+sed -n '/password/{x;p};h' config # Print the line before a line containing 'password' in the file 'config'
+mplayer recent.mp4 -loop 0 -speed 8 # Play a video file recent.mp4 at 8x speed, looping it seamlessly forever
+tcpdump -nn -v -i eth0 -s 1500 -c 1 'ether[20:2] == 0x2000' # Dump information from a CDP frame received on eth0
+tac -s "^[[H" # You can reverse a set of "records" using tac with the -s option and a record separator. Used to make globe spin backwards
+o=$(curl -Ls bit\.ly/globe_vt);yes "$o"|perl -ne '$/="\e[H";$\=$/;print "$_";select(undef,undef,undef,1/24);' # One world, no pv version
+oneworld=$( curl -Ls http://bit\.ly/globe_vt );while sleep .1;do pv -L4220 -q <<<"$oneworld";done # ASCII globe animation
+awk '$3~/^172\.16\./ && $5!~/^172\.16\./{printf("%s %s\n",strftime("%Y-%m-%d_%T", $1),$0)}' conn.log # List traffic from inside to outside
+perl -Mcharnames=:full -CS -wle 'print "\N{EURO SIGN}"'
+topuniq(){ sort|uniq -c|sort "${@:--rn}"; }
+animate http://climagic\.org/images/rice-spinner.gif # ImageMagick's command 'animate' allows you to view animated gifs direct from the URL.
+convert spin.gif -coalesce -gravity NorthEast -draw 'image over 0,0 0,0 "credit.png"' -layers Optimize spin2.gif # Add image to anim gif.
+ffmpeg -f aac -analyzeduration 100M -probesize 100M -i broken.m4a -c copy fixed.m4a # fix a broken M4A file with a corrupted header
+{ find /one; find /two; } | tar zcvf one-and-two.tar.gz -T - # You can use a bracketed command to pipe two find outputs into one tar.
+7z l philip-glass-linux-0.8-minimal.iso # 7zip can also list the contents of iso images and extract them too. No need to mount the image
+play -n -c1 synth whitenoise lowpass -1 120 lowpass -1 120 lowpass -1 120 gain +14 # Star Trek
+stat -c '%a %n' * # display numerical values for file permissions
+lspci | grep -q -e MEI -e HECI && echo "Check your firmware for Intel AMT vulnerability" # Check physical host for vuln. CVE-2017-5689
+https://bellard.org/jslinux/ # x86 JavaScript
+
+telnet magic-1.org 51515 # user: guest; passwd: magic # https://www.youtube.com/watch?v=0jRgpTp8pR8
+
+telnet mapscii\.me # world map on CLI
+for i in 1F6{0..4}{{0..9},{A..F}}; do printf "\\\\U$i\U$i\n"; done # print unicode emoticons
+
+==June 2017==
+curl cheat.sh/python
+curl http://qrenco.de/Very_long_text
+printf "two\nlines" | curl -F-=\<- qrenco.de
+ -> How to convert text into a QR-code in Vim: select the text (shift v + arrows) and :!curl -F-=\<- qrenco.de after that
+If you have Coreutils 8.24+ you can do 'dd if=src of=dest status=progress' too
+curl -s https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_1000.txt | nl | grep vegeta
+join -a2 -j2 <(cat -n old|sort -k2) <(cat -n new|sort -k2)|awk 'NF==3{print$3,-$3+$2,$1;next}{print$2,"-",$1}'|sort -n # show rank change
+awk '($1 % 86400 < 43200 || $1 % 86400 > 75600) {print}’ log # Print lines in log where epoch time (col 1) is before 8am or after 5pm EDT
+dict $( look . | shuf | head -1 ) # WOTD
+
+http://www.infoworld.com/article/3200766/application-development/9-shell-tips-every-developer-should-know.html
+https://www.movavi.com/
+
+==July 2017==
+youtube-dl --write-auto-sub -f 139 -o subtitles CUdwDEKlDrw; grep '<c.color' subtitles.en.vtt|sed 's/<[^>]\+>//g' # Get YT autogen subtitles
+jar tvf path/to/some.jar | awk '{print $NF}' # Print a list of all the classes defined in a Java JAR
+df -hP | column -t # If your Linux device names are long enough that it wraps lines, try using -hP and pipe to column for nicer output.
+dd if=/dev/random of=dont-run-this.bin bs=128 count=$RANDOM ; chmod a+x dont-run-this.bin #Randomware
+head -1 data.csv | tr , $'\n' | nl # Print the number and column name to help write awk expressions
+rlwrap nc smtp.example 25 # Use rlwrap to add readline functionality to nc (or other cmds)
+cnee --record --mouse --keyboard -o http://record.data  -sk q
+cnee --replay -f http://record.data  -v -e /dev/null -ns
+killall -STOP render # Pause execution of any process called render. As if you pressed Ctrl-Z in shell. Resume with 'killall -CONT render'
+geoiplookup 73.250.181.107 # Find out what country/state/city an IP is probably "located" in. No browser required (geoip-bin dpkg)
+tr '\000' '\377' < /dev/zero # How to "make" /dev/one (377 in octal is 0xFF hex or all 8 bits on
+history | awk '{print $2}' | sort | uniq -c | sort -rn | head # list your most used commands
+
+==September 2017==
+dmesg -T | tail -n20
+exiftool -all= photo.jpg # Remove all the exif metadata tags from photo.jpg to improve privacy before uploading
+stellarium --sky-date 20170821 --sky-time 14:27:00 --longitude 87.342581W --latitude 36.782564N # If you can't make it to watch totality.
+links -dump https://www.example.com/contact  | awk -F: '/Math question:/{print $2}' | bc # Solve the basic arithmetic CAPTCHA 
+echo "ping" >/dev/udp/$host/$port # quickly knock a UDP port
+awk '$3~/^src:10\./{print $3};$4~/^dest:10\./{print $4}' network.log |sort |uniq # Get a list of 10/8 internal IPs showing up in col 3 or 4
+zcat month.log.gz | awk '{print $0 | "gzip -v9c > brokenup.log-"$1"_"$2".gz"}' # Breakup large log by syslog month/day and recompress.
+comm -23 <(sort speaker.emails |tr A-Z a-z |uniq) <(sort attendee.emails |tr A-Z a-z |uniq) # What speakers are not on the attendees list.
+tr $'\n' \; < email-list # Format a list of emails so that when you paste them into Outlook (ugh!), it breaks them up into individual addrs
+stat -c %y *.jpg | cut -c1-10 | uniq -c # Produce stats on how many images you took on each day, regardless of strange filenaming schemes.
+df -lk | awk '/^\//{ SUM += $3 } END { print SUM/2**20 " GiB" }' # Print out the total local disk space you are using
+:(){ true; };readonly -f : # You can put this in your shell rc to *help* protect yourself *specifically* from :(){ :|:& };: #bash
+while date +%s | figlet ; do sleep 1 ; clear ; done # Watch the Unix clock in style as it approaches 1.5 billion seconds.
+gunzip -c /var/log/apt/history.log.*.gz | grep 'apt-get install' | cut -f4- -d" " | tr ' ' $'\n' | sort -u # installed packages
+udisksctl mount -b /dev/sdc1 # Using your group privilege, mount (removable drive) /dev/sdc1 as if it automounted with its name.
+
+==October 2017==
+whois slashdot.org | awk '/Creation Date/{print $NF}' # Get the creation date of a domain
+awk 'a[$1 $2]++ < 5' /var/log/syslog # Print the first 5 log lines from each day in syslog
+awk 'length > max { max=length;maxline=$0 } END { print maxline; }' quotes.txt # Print the longest line in quotes.txt
+curl -d '' http://roku\.home:8060/keypress/Up # Move up in your Roku interface. Great for when you can't find the remote.
+for i in log.{48..1}.gz ; do printf "$i\t" ; zgrep problem $i | wc -l ; done # Generate line stats of a problem over time in old logs
+[C-x] * # Alt. way you can exclude items from a glob match is to expand the glob with Ctrl-x * and then just remove the items you don't want
+du -sh [a-m]*/ --exclude=export/ # Measure the disk space used by directories starting with a-m, skip exports dir
+ -> du -sh -I export [a-m]* # Measure the disk space used by directories AND FILES starting with a-m, skip export dir
+echo %42%65%20%63%61%72%65%66%75%6c%20%77%68%61%74%2f%68%6f%77%20%79%6f%75%20%64%65%63%6f%64%65%0a | xxd -p -r # Decode a hex encoded string
+look . | egrep "^s.*m.*b" | egrep "^.{4,9}$" # Show a list of the other candidates for an open source SMB service
+ls 2017-0[5-9]-??.wav |cut -c 1-11 |date -f- +%A |sort|uniq -c|sort -nr # Stats for most common DOW for these wav files between May and Sept
+echo $((2#1101)) # calculate binary 1101 => decimal
+printf '%x\n' $((2#1101)) # calculate binary 1101 => hexadecimal
+xargs < file.txt # This is an easy way to join a file into one line if you're in a hurry. Be careful with large data though, might truncate.
+diff -rq dir1 dir2 # compare folder contents and show the difference
+[Ctrl-b] s # Have more than one tmux sessions running? Start tmux first and this keystroke lets you choose other tmux sessions easily
+less log log.2 log.3 | grep " 404 " | more # Did you know that if your output from 'less' is a pipe, it behaves like cat
+dpkg -l '*4.10.0*' | cat # Sometimes in cases where columns are truncated, you can make them visible by passing output through cat
+perl -e 'use bytes; for($t=0;;$t++){ print chr($t*(($t>>13|$t>>8)&30&$t>>4)); }' | play -t raw -b8 -r8k -e un - vol 0.5 # Infinite "music"
+while :;do rig |head -1 |tr '\n' ,;echo $RANDOM{,,,,} |tr -d ' ' ;done |sed -r -e 's/,(...)(..)(....).*/,\1-\2-\3/' # "Infinite" data breach
+grep -ao "[/\\]" /dev/urandom|tr -d \\n # 39 character infinite ASCII maze generator.
+play -n -c1 synth whitenoise band -n 100 20 band -n 50 20 gain +30 fade h 1 86400 1 # Pretend you are on a starship (Uses sox)
+alias ohmyawk='awk -i ~/.awk/myfunctions' # Create an alias for awk that includes your own custom awk functions.
+stellarium --sky-date 20170821 --sky-time 14:27:00 --longitude 87.342581W --latitude 36.782564N # If you can't make it to watch totality.
+
+==December 2017==
+sshfs user@remotehost:/remotedir localdir # sshfs is a util that uses FUSE and SSH to mount a remote directory as a local one. #TwoAteZero Available in most repos:
+ Deb: apt-get install sshfs
+ Mac OSX: brew install sshfs
+ Red Hat: yum install fuse-sshfs
+ Yes Arch too: pacman -S sshfs
+sort -t, -k5nr data.csv | less # Sort data.csv by the 5th column's numeric values in descending order.
+t stream search -l love |pv -l >/dev/null # Count how many times per second the word love is used on Twitter in real time
+bvi # binary vi
+
+==May 2018==
+X="oooooooooo";{ printf 'static char *tmp[] = {"10 10 4 1","o c #111","R c #F00","B c #00F","Y c #FF0",';printf '"%s",' $X $X $X $X ooYYoooooo oooYYooooo $X $X RRooooBooo RRoooBBBoo; echo '};' ; } | convert xpm:- -scale 200x tetris.gif # Tetris "game" in <280
+sed -n '1,2p;8,23p' LICENSE|tr $'\t' ' '|convert -size 500x400 -background transparent -mattecolor transparent -fill orange -font Helvetica-Bold -pointsize 13 -gravity center -distort Perspective '0,0 100,200 500,0 400,200 0,300 -500,800 500,300 1000,800' caption:@- GPLtext.png
+showcolor(){ display -size 400x400 "xc:$1" ; }; showcolor '#6495ED' # Check what a color code will look like by making a function to display them.
+convert inputmemeimage.png -font impact -fill white -pointsize 48 -stroke black -strokewidth 2 -gravity north -annotate 0 'TOP TEXT' -gravity south -annotate 0 'BOTTOM TEXT' outputmemeimage.png # Make your own meme image using Imagemagick.
+awk '{print length($0) " " $0}' tweets.txt # Print the length of each line of a file in front of the line itself.
+convert -size 1280x720 xc: +noise Random -channel R -threshold 0.5% -negate -channel RG -separate +channel -compose multiply -composite stars.png # Use Imagemagick to generate a decent star field.
+fc # This will edit the previously run command in $EDITOR. So it's a good idea to set EDITOR to your favorite one. Executes on editor exit.
+PROMPT_COMMAND='[ $? -ne 0 ] && play -qn synth sin G3 trim 0 0.1' # Play a sound if you get an unsuccessful return code from last command.
+printf "%3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n" $( echo {1..10}*{1..10}\; | bc ) # Create a multiplication table.
+convert receipt.jpg -crop 1000x2000+1500+0 -fuzz 25% -trim fd:1 | display -resize 50% - # Use ImageMagick convert and display to crop an image and see immediately the effect. fd:1 means write to stdout and the - for display captures stdin. fuzz and trim remove excess border.
+awk '$7~/\?.+/{key=$1 " " substr($7,index($7, "?")); a[key]++} END{ for (k in a) print k}' access_log |cut -d' ' -f 1 |sort |uniq -c |sort -nr |head -20 # Show top hosts using widest variety of URL query strings. Maybe indicating attackers or even vulnerable software.
+for d in {1..2001}; do date -d "now - $d days" +"%Y/%-m/%-d" ; done # Generate last 2001 days of dates and don't zero pad mon/day by using %-m and %-d in the format.
+grepcidr - Filter IP addresses matching IPv4 CIDR/network specification (e.g., grepcidr 10.71.0.0/18 rand_ips.txt)
+pee - tee standard input to pipes
+ -> grep -i -e foo -e bar -e bam text.txt | pee cat wc # Case insensitive (-i) search for 3 different terms (multiple -e) in text.txt and print the results and also send the results through wc to see the final line count.
+poly(){ c=`bc -l <<<"for(;i++<$1;){t=6.28*i/$1;print s(t)*$2+$2,\",\";c(t)*$2+$2}"`;convert -size $[$2*2]x$[$2*2] xc: -draw "polygon $c" png:-|display; } # Function to draw a regular polygon using ImageMagick commands.
+ -> Ex: poly 8 280
+awk '$9~/^5/' access_log | less -S +/" 5.. " # Check your access_log for requests that had 5XX level HTTP errors. less auto search highlight
+awk '$9=="404"{a[$1 " " $7]++} END{for (k in a) print k;}' access_log |cut -d' ' -f1 |sort |uniq -c |sort -rn |head -20 # Shows top hosts making the widest ranging scans of resources you don't have on your website.
+find . -vulnerability crit -name '*.php' # Find all the PHP files with critical vulnerabilities in them.
+echo "import this" | python # Python language "easter egg".
+python3 -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < broken.yaml > fixed.json
+curl http://parrot.live
+grep -C3 searchpattern file # Search for searchpattern in file and provide 3 lines above and 3 lines below of context in the output.
+grep -f patterns.txt < file # Along those same privacy lines, you can prevent the files you are searching through and your patterns from being seen in the process table by redirecting from stdin and using grep's -f option.
+$EDITOR # On hosts with access by others, you may wish to keep the file you are working on out of the process table for privacy or even security reasons. In which case you can start the editor first and then open the file from within.
+file -P bytes=10 * # Limit bytes read per file to speed up the 'file' command by reducing extra info. This isn't available in all versions.
+for f in *.csv ; do tail -n +2 $f > headerRemoved/$f ; done # Make a copy of all csv files in CWD with first line (header) omitted.
+ssh pi@raspberrypi.home 'arecord -f cd -D plughw:1 | ffmpeg -ac 1 -i - -f ogg -' | mplayer - -idle -demuxer ogg # Baby monitor over ssh, making it more private/secure than those in stores. Replace plughw:1 with mic device from arecord -l output. Make it a script for easy access.
+curl -s https://data.iana.org/TLD/tlds-alpha-by-domain.txt | egrep "^[^#]{3,}" | wc -l # Count the number of 3+ letter TLDs
+for p in 20180302_{00..23}{00..55..5}.jpg;do [ -e $p ] || echo $p;done # Check if you're missing a file in time sequence of 5 min increments
+echo {00..23}{00..55..5} # Print every 5th minute of the day. Since version 4, Bash has an increment feature on brace expansion ranges.
+identify -format "%k:%f\n" 20180302_*.jpg | awk -F: '$1 < 50000{print $2}' | xargs -I{} mv -v {} darks/ # Move low-color-count pictures from raspberry pi plant camera to darks directory. Making timelapse video. Requires some testing first to find threshold. Uses ImageMagick
+date -d @$((2**31-1)) # You heard it here first. Less than 20 years to go before 32-bit epochtime runs out.
+stty -echo; grep -F -f- passwords.txt; stty echo # Use the -f option with - to read search patterns from stdin. Press [Ctrl-d] twice when done. I used -F here for fixed string to avoid things like . matching all. I do all this to avoid passwords in the process table or history.
+
+rainymood() {
+  FILE=$((RANDOM%4))
+  URL="https://rainymood.com/audio1110/${FILE}.ogg"
+  mpv "$URL" && rainymood
+}
+
+feh -F -D90 --recursive --randomize --auto-zoom ~/Pictures # Create a random image slideshow w/ 90 sec delay for #RaspberryPi + old monitor.
+grep -E '\b4\.5\.6\.7\b' log # Escape special characters and provide context when searching for IPs to avoid matching other IPs/non IP data.
+PS1="\t $PS1"  # Customized your shell prompt in BASH so that it is prefixed with the current time.
+while :; do echo wub wub wub | espeak --stdout | play - pitch -400 bend .3,-600,.3 ; done # CLI generated dubstep
+curl rate.sx/eth
+TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/" | dd bs=32 count=1 2>/dev/null)
+
+==September 2018==
+tar ztvf large.tar.gz | awk '{s+=$3}END{print s}' # Use awk to sum up the sizes of the files inside a compressed archive file. Unfortunately you can't use gzip -l on files where the uncompressed data is greater than 4GB.
+mkdir PNG && find . -maxdepth 1 -name '*.svg' | while IFS=$'\n' read f ; do inkscape "$f" --export-png="PNG/${f%%.svg}.png"; done # SVG 2 PNG in CWD. Using Inkscape's command line functionality to convert SVG documents into PNG images.
+elinks -no-numbering -dump-width 999 $(date +"http://enwp.org/%B_%d ")|sed '/Births/,/Deaths/!d'|grep \* | egrep -i --color=no "(math|computer|program|engineer|scien|invent)" # Show today's famous #STEM birthdays from the Wikipedia page for today's date.
+comm -3 <(ls olddir) <(ls newdir) # Compare the contents of 2 directories by showing only 2 columns, one for the files unique to each directory.
+rpm -qa --queryformat "%10{SIZE} %{NAME}\n" | grep -Ev "(kernel|glibc|perl$|python-libs$|coreutils|hwdata$|glib2|grub2$|yum$|binutils$)" | sort -rn | head -100 # Show the largest #rpm packages on the system, omitting *some* of the critical ones.
+blue(){ tput setaf 4; echo $@; tput sgr0; } # Make text passed by argument to this function blue. ex: blue "I'm blue"
+rpm -qa --last | head # Show the last 10 packages installed on an RPM based host.
+script upgrade.log # script is a nice program that allows you to record your interactive shell session and records everthing that seen in your terminal. Just exit the shell when done. Great for logging upgrades, audits, and general CYA work. # OR `exit 1`
+play -n synth -j 3 sin %3 sin %-2 sin %-5 sin %-9 sin %-14 sin %-21 fade h .01 2 1.5 delay 1.3 1 .76 .54 .27 remix - fade h 0 2.7 2.5 norm -1 # Chimes sound from the 'sox' man page.
+du -shc *.png | tail -1 # Display the total size used by PNG image files in the current directory
+dict us-zipcode | dict country-name
+awk -F, '/^2/ && $10!="" { key1=substr($1,1,10) $2; key2=$10 "," $11 "," $12; a[key1][key2]=$0; if(length(a[key1]) > 1){ for (i in a[key1]) { print a[key1][i]  } }}' duolog.csv | sort | uniq # In Duo 2FA log, find users who logged in from two different geo locations on same day.
+awk -F, '{print $2}' users.csv | while read -r u ; do useradd -m -d /home/$u -G users $u ; echo $u ; done # Take a list of usernames from a csv file (you should check the output of awk print $2 for sanity first) and create each one, also adding them to a 'users' group.
+look . | grep -E "^[a-z]{2,}$" | sort > wordlist ; rev wordlist | sort > wordlistrev ; comm -12 wordlist wordlistrev # Find words that have a reverse which is also a word.
+ -> look . | grep -E "^[a-z]{4,7}$" > wordlist ; rev wordlist > wordlistrev ; grep -x -f wordlistrev wordlist # Find words that make other words backwards. This can take a while. This example limits to words 4-7 letters long but you can change the regex for longer/shorter words.
+
+sd ()
+{
+ cal -y | GREP_COLORS="mt=07;32" \grep --color=always -EC 4 " $1 |^$1 " | GREP_COLORS="sl=11;33:mt=07;33" \grep --color=always -B2 -A6 '[A-Z][a-z] '
+}
+
+https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt
+play -n -c1 synth whitenoise band -n 100 20 band -n 50 20 gain +30 fade h 1 86400 1 # Pretend you are on a starship 
+apt-get install multitail
+
+==October 2018==
+eval play -n synth .25 pl\ {F2,F2,G2,F2,G#2,F2,Bb2,A2} delay $( seq 0 .25 1.75 ) repeat 100 remix - # Play the bass line from the theme to Peter Gunn using sox play. Also known from Blues Brothers, Spy Hunter, etc.
+Want to know when you closed your laptop lid and open it in #ubuntu
+Run `zgrep -P 'systemd-sleep\[\d+\]: (Suspending system|System resumed)' /var/log/syslog*` in command line
+display $( find /usr/share/icons -name '*folder.png' | grep 64x64 ) # Just used this to browse through the different styles of folder icons at 64x64 res that were available in Linux for some clipart (with attribution of course ;). The 'display' command is from ImageMagick
+dotshare.it/  # This site allows people to share their dot config files. For instance, they have a collection of people's .bashrc files for doing flashy or interesting things with their prompts, etc.
+PROMPT_COMMAND='[ $? -eq 0 ] || printf "(╯°□°）╯︵ ┻━┻\n"' # You can set this in your bash shell config to flip a table whenever a command fails with a non-zero exit status.
+inotifywait -e open art.jpg && s=$(stat -c %s art.jpg );h=$(($s/2));r=$((s-h)); dd if=/dev/urandom | grep -a -o -P "[\x01-\xD0]" | tr -d $'\n' | dd of=art.jpg bs=1 seek=$h count=$r # Digitally "shred" half a file after it is opened. #Banksy
+strace -e open -p 4450 -p 5523 # What the hell are process ids 4450 and 5523 trying to open that's driving up the system load so much? This only filters out the open syscalls. For all of them, just leave the -e open part off.
+date -d @1539217802 # Using GNU date you can convert a Unix epoch time back into a human readable date by prefixing it with @
+awk '{n=$1-lc;if (n<-1||n>1) { print; lc=$1; }}' temp.log # Show temperature log lines when the temperature value changes more than one degree in either direction.
+for i in {1..50} ; do d=$(( RANDOM % 29950 + 6575 )) ; date -d "$d days ago" +"%F"; done # Create 50 random dates that are between 18 - 100 years ago. Used to create example birth date data.
+
+==November 2018==
+# Calculate primes: current=0; max=110; echo 1; echo 2; for((i=3;i<=max;)); do for((j=i-1;j>=2;)); do if [  `expr $i % $j` -ne 0 ] ; then current=1; else current=0; break; fi; j=`expr $j - 1`; done; if [ $current -eq 1 ] ; then echo $i; fi; i=`expr $i + 1`; done
+
+==January 2019==
+openssl rand -hex 6  # generate a random password (12 characters)
+echo "h"{,,,,}
+ssh -R 5000:localhost:5000 user@host-with-https # Did this from a raspberry pi at home that I wanted to control from Alexa, which requires recognized SSL cert. So Alexa connects to my website, then mod_rewrite redirects to the SSH reverse tunnel and connects to program on Pi.
+ls ????????????????????* # Shell globbing doesn't have a quantifier expression such as {20}, but you can just use enough '?'s to indicate the quantity of characters you need to match. In this case, match files 20 characters or longer.
+date -d "+ 20 years"|| date -v +20y # Tomorrow at 01:37:04 UTC is the halfway point between Y2K and the Unix signed 32-bit epoch rollover on Jan 19th, 2038. Think it doesn't matter? Consider that Raspbian OS for Raspberry Pi's is still 32-bit. 
+touch -r 1218181022.jpg 1218181022-mirrored.jpg # Change the timestamp on a file so that it matches that of a reference file.
+
+==February 2019==
+curl http://ifconfig.co
+curl -4 http://ifconfig.co
+telnet towel.blinkenlights.nl
+curl wttr.in
+
+==March 2019==
+dd if=/dev/urandom | gzip -9 >> /dev/null & # Create artificial CPU load on the VM (by forcing the CPU to continuously attempt to compress random data)
+openssl md5 -binary myfile.txt | openssl enc -base64 # => MD5 hash
+cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1
+xxd -p -l 32 -c 32 /dev/random
+ -> xxd -p -l 4 /dev/random
+ -> python -c 'import os,base64; print base64.urlsafe_b64encode(os.urandom(16))'
+https://backreference.org/2014/11/12/on-the-fly-ipsec-vpn-with-iproute2/
+
+==April 2019==
+inotifywait -e open art.jpg && s=$(stat -c %s art.jpg );h=$(($s/2));r=$((s-h)); dd if=/dev/urandom | grep -a -o -P "[\x01-\xD0]" | tr -d $'\n' | dd of=art.jpg bs=1 seek=$h count=$r # Digitally "shred" half a file after it is opened.
+lspci -v -s 01:00.0 # GPU memory
+curl rate.sx/btc
+1/137 => fine structure constant
+
+==July 2019==
+curl -L https://goo.gl/S1Dc3R | bash -s 2 \
+      "http://localhost:8081"
+
+==August 2019==
+head -c 16 /dev/urandom | od -An -t x | tr -d ' '  # generate a token/password
+telnet mapscii.me # https://github.com/rastapasta/mapscii
+npm i -g movie-cli
+ -> movie Far and Away
