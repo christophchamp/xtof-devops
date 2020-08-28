@@ -153,6 +153,7 @@ perl -ane 'chomp;\
     print "replace into cmp_genomics.features (accession,user,featuretype,start,stop,dir) \
     VALUES (\"$F[0]\",USER(),\"rRNA\",$F[3],$F[4],\"$F[6]\");\n";' < source/$accession.rnammer.ssu.gff | mysql
 end
+```
   
 ## COLLECTING THE RESULTS
 
