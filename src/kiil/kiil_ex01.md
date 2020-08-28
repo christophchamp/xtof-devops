@@ -1,10 +1,11 @@
 # Exercise 1
-  
+
 ## Introduction to UNIX
-  
+
 Unless you are already familiar with operating in a UNIX environment it might be worthwhile to go through the Pedestrians guide to Unix.
 
 ## OBJECTIVES
+
 The purpose of this exercise is to become familiar with tools for prokarypotic gene prediction (protein coding, as well as tRNA, and rRNA genes) and to introduce methods allowing faster and easier retrieval and comparison of the data.
   
 * Key tools used in this exercise are:
@@ -47,14 +48,14 @@ We will download genbank files for the following strains using a Perl script tha
 +-----------+-----------------------------------------------------------------+
 ```
 
-Hopefully soon it will become trivial to type in all the accession numbers, and we will take advantage of the C-shell to wrap the Perl script in a foreach-loop from the shell.
+Hopefully, soon it will become trivial to type in all the accession numbers, and we will take advantage of the C-shell to wrap the Perl script in a foreach-loop from the shell.
 
 * Execute the following to download all the GenBank files:
 ```
 $ mkdir source
 $ foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-$ ~/src/scripts/mygetgene/mygetgene $accession > source/$accession.gbk &
-$ end
+    ~/src/scripts/mygetgene/mygetgene $accession > source/$accession.gbk &
+  end
 $ wait
 ```
 
@@ -65,14 +66,14 @@ We will now need to extract the DNA sequence from each of the genbank file (clic
 echo "delete from cmp_genomics.genomes where user=USER()" | mysql
 foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
 perl -ne 'print ">$1\n" if /^LOCUS\s+(\S+)/;\
-        if ( /^\s+\d+\s+([ATGCRYWSMKHBVDN\s]+)$/gi ) { $l = uc($1); $l =~ s/\s//g;print "$l\n"; } ' \
-        < source/$accession.gbk > source/$accession.fsa
+    if ( /^\s+\d+\s+([ATGCRYWSMKHBVDN\s]+)$/gi ) { $l = uc($1); $l =~ s/\s//g;print "$l\n"; } ' \
+    < source/$accession.gbk > source/$accession.fsa
 perl -ne 'chomp;$accession = $1 if />(.*)/; next unless /^([ATGCRYWSMKHBVDN]+)$/; $seq .= $1; \
-        END{ print "insert into cmp_genomics.genomes (accession,user,seq) VALUES (\"$accession\",USER(),\"$seq\");\n";}' \
-        < source/$accession.fsa | mysql
+    END{ print "insert into cmp_genomics.genomes (accession,user,seq) VALUES (\"$accession\",USER(),\"$seq\");\n";}' \
+    < source/$accession.fsa | mysql
 perl -ne 'chomp;$def = $1 if /^DEFINITION\s+(.*)/; $accession = $1 if /^LOCUS\s+(\S+)/;\
-        END{ print "update cmp_genomics.genomes set organism=\"$def\" where user=USER() and accession=\"$accession\";\n";}' \
-        < source/$accession.gbk | mysql
+    END{ print "update cmp_genomics.genomes set organism=\"$def\" where user=USER() and accession=\"$accession\";\n";}' \
+    < source/$accession.gbk | mysql
 end
 ```
 
@@ -135,12 +136,13 @@ end
 
 The next method is still in the development at CBS, and a paper is being written about this method. Basically, the method uses HMM to predict rRNA genes by using structural alignments of rRNA genes. Other methods relies on BLAST to find close homologs but such methods are likely to give too few hits and fails to find start/stop position of the gene very accuratly.
   
-1. Execute 'rnammer' to preduct 16s rRNA genes using a Hidden Markov Model:
+1. Execute `rnammer` to preduct 16s rRNA genes using a Hidden Markov Model:
 ```
 foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
   rnammer -multi -S bac -m ssu -gff source/$accession.rnammer.ssu.gff source/$accession.fsa &
 end
 wait
+```
 
 2. Again, the output is in GFF, and we do a simple count to extract the number of 16s rRNA genes:
 ``` 
@@ -154,42 +156,63 @@ end
   
 ## COLLECTING THE RESULTS
 
-Now, time for recap. You have now hopefully managed to download and convert full 6 genome sequences, and predicted coding sequences, tRNA, and rRNA in all of the. Also, you have stored all your predictions and a shared mysql table. You are now going to enter the mysql client in to order to access your results. You open the client by writing 'mysql' at the prompt. The new prompt will show 'mysql>' once it's ready. When pasting in mysql-code from the section below, please leave out the 'mysql>'-part. This is included just to make you aware, that the mysql client is active.
+Now, time for recap. You have now hopefully managed to download and convert full 6 genome sequences, and predicted coding sequences, tRNA, and rRNA in all of the. Also, you have stored all your predictions and a shared mysql table. You are now going to enter the mysql client in to order to access your results. You open the client by excuting `mysql` at the prompt. The new prompt will show `mysql>` once it is ready. When pasting in mysql-code from the section below, please leave out the `mysql>`-part. This is included just to make you aware, that the mysql client is active.
   
 1. Open the MySQL client:
 ```
 mysql
-mysql> use cmp_genomics
+mysql> USE cmp_genomics;
 ``` 
 
 2. We start out with a simple query. This will list all the genomes you have now analysed.
 ```
-mysql> select accession,organism,length(seq) from genomes where user=USER() order by organism;
+mysql> SELECT accession,organism,length(seq)
+       FROM genomes
+       WHERE user=USER()
+       ORDER BY organism;
 ```
 
 3. Next is to look at the features you have predicted for each accession number:
 ```
-mysql> select accession,count(*) from features where user=USER() and featuretype='rRNA' group by accession;
+mysql> SELECT accession,count(*)
+       FROM features
+       WHERE user=USER()
+         AND featuretype='rRNA'
+       GROUP BY accession;
 ```
 Repeat this step for CDS' and tRNA.
  
 You could also list all features predicted by doing a group by accession and the feature type:
 ```
-mysql> select featuretype,accession,count(*) from features where user=USER()  group by accession,featuretype;
+mysql> SELECT featuretype,accession,count(*)
+       FROM features
+       WHERE user=USER()
+       GROUP BY accession,featuretype;
 ```
 
 4. MySQL also allows you to cross reference tables (relational query). This query will summarize the total length of predicted CDS' for each genome as well as average gene length.
 Remember that genome length was stored in a
 ```
-mysql> SELECT genomes.accession,organism,SUM(stop-start+1) as total_length,AVG(stop-start+1) as avg_length FROM features,genomes \
-       WHERE features.user=USER() AND featuretype='CDS' AND features.user = genomes.user AND genomes.accession = features.accession \
+mysql> SELECT genomes.accession,organism,SUM(stop-start+1)
+         AS total_length,AVG(stop-start+1)
+         AS avg_length
+       FROM features,genomes \
+       WHERE features.user=USER()
+         AND featuretype='CDS'
+         AND features.user = genomes.user
+         AND genomes.accession = features.accession \
        GROUP BY genomes.accession;
 ```
 
 5. We can also perform a relational query between the genomes table and the features table in order to derive the coding density. The coding density is the total length of all CDS' divided by the total genome (this fraction is the percentage of the total coding capacity of the genome)
 ```
-mysql> SELECT features.accession,organism,SUM(stop-start+1)/LENGTH(seq) as Coding_Density from features,genomes \
-       WHERE featuretype = 'CDS' AND features.user = genomes.user AND features.user = USER() AND features.accession = genomes.accession \
+mysql> SELECT features.accession,organism,SUM(stop-start+1)/LENGTH(seq)
+         AS Coding_Density
+       FROM features,genomes \
+       WHERE featuretype = 'CDS'
+         AND features.user = genomes.user
+         AND features.user = USER()
+         AND features.accession = genomes.accession \
        GROUP BY features.accession;
 ```
 
