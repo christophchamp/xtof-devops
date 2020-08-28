@@ -1,74 +1,76 @@
 # Exercise 1
-# 
-# Introduction to UNIX
-# 
-# Unless you are already familiar with operating in a UNIX environment it might be worthwhile to go through the Pedestrians guide to unix.
-# OBJECTIVES
-# The purpose of this exercise is to become familiar with tools for prokarypotic gene prediction (protein coding, as well as tRNA, and rRNA genes) and to introduce methods allowing faster and easier retrieval and comparison of the data.
-# 
-# Key tools used in this exercise are:
-# Perl - a platform independent scripting language commonly used in bioinformatics.
-# Perl stands for Practical Extraction and Report Language.
-# EasyGene was developed by Thomas Schou Larsen and Anders Krogh at CBS and it uses HMMs (Hidden Markov Models) to predict location of genes in prokaryotic genomes.
-# The HMMer package, developed by Sean Eddy is used to build Profile HMMs which will be used to scan genome sequences. This package is utilised by RNAmmer - an in-house tool to predict rRNA.
-# tRNAscan-SE by Sean Eddy is a very common tool for predicting tRNA genes.
-# We will be using a MySQL database to contain these results.
-# 
-# 
-# 
-# We will start out by acquiring 8 complete genome sequences. This will demonstrate how prediction and comparison tools can assist in the characterization and comparison of genome sequences.
-# 
-#    1.
-#       LOG IN
-#       Open a session on 'organism.cbs.dtu.dk', and from this login to ibiology and create directories for you to work in:
-# 
-       ssh -X ibiology
-       mkdir Ex1
-       cd Ex1
-       unset correct
-# 
-#       The last command turns off spelling correction, which can interfere with complex commands.
-#    2.
-#       DOWNLOAD GENBANK FILES
-#       We will download genbank files for the following strains using a Perl script that contacts NCBI's website:
-# 
-#       +-----------+-----------------------------------------------------------------+
-#       | accession | organism                                                        |
-#       +-----------+-----------------------------------------------------------------+
-#       | AE016879  | Bacillus anthracis str. Ames, complete genome.                  |
-#       | AE017042  | Yersinia pestis biovar Microtus str. 91001, complete genome.    |
-#       | AL111168  | Campylobacter jejuni subsp. jejuni NCTC 11168 complete genome.  |
-#       | AL645882  | Streptomyces coelicolor A3(2) complete genome.                  |
-#       | AP008232  | Sodalis glossinidius str. 'morsitans' DNA, complete genome.     |
-#       | AP009048  | Escherichia coli W3110 DNA, complete genome.                    |
-#       | BA000021  | Wigglesworthia glossinidia endosymbiont of Glossina brevipalpis |
-#       | CP000034  | Shigella dysenteriae Sd197, complete genome.                    |
-#       +-----------+-----------------------------------------------------------------+
-# 
-#       Hopefully soon it will become trivial to type in all the accession numbers, and we will take advantage of the C-shell to wrap the perl script in a foreach-loop from the shell. Execute the following to download all the GenBank files:
-# 
-       mkdir source
-       foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-       ~pfh/scripts/mygetgene/mygetgene $accession > source/$accession.gbk &
-       end
-       wait
-# 
-#    3.
-#       CONVERT AND STORE SEQUENCE INFORMATIfON
-#       We will now need to extract the DNA sequence from each of the genbank file (click here to see a sample genbank file), by using a little Perl one-liner written for this exercise.
-# 
-       echo "delete from cmp_genomics.genomes where user=USER()" | mysql
-       foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-       perl -ne 'print ">$1\n" if /^LOCUS\s+(\S+)/;\
-               if ( /^\s+\d+\s+([ATGCRYWSMKHBVDN\s]+)$/gi ) { $l = uc($1); $l =~ s/\s//g;print "$l\n"; } ' \
-               < source/$accession.gbk > source/$accession.fsa
-       perl -ne 'chomp;$accession = $1 if />(.*)/; next unless /^([ATGCRYWSMKHBVDN]+)$/; $seq .= $1; \
-               END{ print "insert into cmp_genomics.genomes (accession,user,seq) VALUES (\"$accession\",USER(),\"$seq\");\n";}' \
-               < source/$accession.fsa | mysql
-       perl -ne 'chomp;$def = $1 if /^DEFINITION\s+(.*)/; $accession = $1 if /^LOCUS\s+(\S+)/;\
-               END{ print "update cmp_genomics.genomes set organism=\"$def\" where user=USER() and accession=\"$accession\";\n";}' \
-               < source/$accession.gbk | mysql
-       end
+  
+## Introduction to UNIX
+  
+Unless you are already familiar with operating in a UNIX environment it might be worthwhile to go through the Pedestrians guide to Unix.
+
+## OBJECTIVES
+The purpose of this exercise is to become familiar with tools for prokarypotic gene prediction (protein coding, as well as tRNA, and rRNA genes) and to introduce methods allowing faster and easier retrieval and comparison of the data.
+  
+* Key tools used in this exercise are:
+  * Perl - a platform independent scripting language commonly used in bioinformatics. (note: Perl stands for Practical Extraction and Report Language.)
+  * EasyGene was developed by Thomas Schou Larsen and Anders Krogh at CBS and it uses HMMs (Hidden Markov Models) to predict location of genes in prokaryotic genomes.
+  * The HMMer package, developed by Sean Eddy is used to build Profile HMMs which will be used to scan genome sequences. This package is utilised by RNAmmer - an in-house tool to predict rRNA.
+  * tRNAscan-SE by Sean Eddy is a very common tool for predicting tRNA genes.
+  * We will be using a MySQL database to contain these results.
+
+We will start out by acquiring 8 complete genome sequences. This will demonstrate how prediction and comparison tools can assist in the characterization and comparison of genome sequences.
+
+1. LOG IN: Open a session on 'organism.cbs.dtu.dk', and from this login to ibiology and create directories for you to work in:
+```
+$ ssh -X ibiology
+$ mkdir Ex1
+$ cd Ex1
+$ unset correct
+```
+
+The last command turns off spelling correction, which can interfere with complex commands.
+
+2. DOWNLOAD GENBANK FILES: We will download genbank files for the following strains using a Perl script that contacts NCBI's website:
+ 
+```
++-----------+-----------------------------------------------------------------+
+| accession | organism                                                        |
++-----------+-----------------------------------------------------------------+
+| AE016879  | Bacillus anthracis str. Ames, complete genome.                  |
+| AE017042  | Yersinia pestis biovar Microtus str. 91001, complete genome.    |
+| AL111168  | Campylobacter jejuni subsp. jejuni NCTC 11168 complete genome.  |
+| AL645882  | Streptomyces coelicolor A3(2) complete genome.                  |
+| AP008232  | Sodalis glossinidius str. 'morsitans' DNA, complete genome.     |
+| AP009048  | Escherichia coli W3110 DNA, complete genome.                    |
+| BA000021  | Wigglesworthia glossinidia endosymbiont of Glossina brevipalpis |
+| CP000034  | Shigella dysenteriae Sd197, complete genome.                    |
++-----------+-----------------------------------------------------------------+
+```
+
+Hopefully soon it will become trivial to type in all the accession numbers, and we will take advantage of the C-shell to wrap the Perl script in a foreach-loop from the shell.
+
+* Execute the following to download all the GenBank files:
+```
+$ mkdir source
+$ foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+$ ~/src/scripts/mygetgene/mygetgene $accession > source/$accession.gbk &
+$ end
+$ wait
+```
+
+3. CONVERT AND STORE SEQUENCE INFORMATIfON
+
+We will now need to extract the DNA sequence from each of the genbank file (click here to see a sample genbank file), by using a little Perl one-liner written for this exercise.
+```
+echo "delete from cmp_genomics.genomes where user=USER()" | mysql
+foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
+perl -ne 'print ">$1\n" if /^LOCUS\s+(\S+)/;\
+        if ( /^\s+\d+\s+([ATGCRYWSMKHBVDN\s]+)$/gi ) { $l = uc($1); $l =~ s/\s//g;print "$l\n"; } ' \
+        < source/$accession.gbk > source/$accession.fsa
+perl -ne 'chomp;$accession = $1 if />(.*)/; next unless /^([ATGCRYWSMKHBVDN]+)$/; $seq .= $1; \
+        END{ print "insert into cmp_genomics.genomes (accession,user,seq) VALUES (\"$accession\",USER(),\"$seq\");\n";}' \
+        < source/$accession.fsa | mysql
+perl -ne 'chomp;$def = $1 if /^DEFINITION\s+(.*)/; $accession = $1 if /^LOCUS\s+(\S+)/;\
+        END{ print "update cmp_genomics.genomes set organism=\"$def\" where user=USER() and accession=\"$accession\";\n";}' \
+        < source/$accession.gbk | mysql
+end
+```
 # 
 #    4.
 #       PREDICT THE NUMBER OF CDS
