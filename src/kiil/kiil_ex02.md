@@ -16,6 +16,7 @@ The purpose of this exercise is to become familiar with the construction of geno
 ssh -X ibiology
 mkdir Ex2
 cd Ex2
+```
 
 2. Remember that we are working on the following genomes:
 ```
@@ -89,8 +90,7 @@ $ wait
 
 This creates a postscript file of the structure atlas for each genome.
 
-5. Making a genome atlas
-For the genome atlas, the procedure is the same as the two previous atlases. Thus we make it in one big step
+5. Making a genome atlas: For the genome atlas, the procedure is the same as the two previous atlases. Thus we make it in one big step
 ```
 $ foreach genome (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
     gmake $genome.genomeatlas.cf &
@@ -101,6 +101,7 @@ $ foreach genome (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021
     gmake $genome.genomeatlas.ps
   end
 $ wait
+```
 
 And once this is done we have a postscript file of the genome atlas for each genome.
 
