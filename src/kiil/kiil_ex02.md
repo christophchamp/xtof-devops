@@ -105,12 +105,12 @@ $ wait
 
 And once this is done we have a postscript file of the genome atlas for each genome.
 
-6. Making a genome atlas
-Now last time, we could see from the gene counts that for some organisms the number of predicted genes was much lower than expected. Let us try to have a look at this on an atlas and compare it to the genbank annotations. We do this by first making a new annotation file.
+6. Making a genome atlas: Now last time, we could see from the gene counts that for some organisms the number of predicted genes was much lower than expected. Let us try to have a look at this on an atlas and compare it to the genbank annotations. We do this by first making a new annotation file.
 ```
 $ foreach genome (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
     mysql -B -e "select CONCAT(featuretype,'2'), start, stop, dir, featuretype from features where user = USER() \
       and accession = '$genome' order by start" cmp_genomics > $genome.pred.ann
+```
 
 Now we make a backup of the atlases that we already have:
 ```
