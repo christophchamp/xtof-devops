@@ -13,7 +13,7 @@ my $tot=0;
 my $orf = "";
 my $cds = "";
 
-open TRANS , '/home/people/pfh/scripts/codon-usage/trans.txt';
+open TRANS , '/home/people/xtof/scripts/codon-usage/trans.txt';
 while (<TRANS>) {
 	chomp;
 	($triplet,$aa) = split (/\t+/,$_);
