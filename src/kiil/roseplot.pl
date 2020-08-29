@@ -3,7 +3,7 @@
 # Peter Hallin
 # Donut effect added 2006
 
-#use lib qw(/home/people/pfh/scripts/roseplot/PostScript-Simple-0.06p3/lib);
+#use lib qw(/home/people/xtof/scripts/roseplot/PostScript-Simple-0.06p3/lib);
 use PostScript::Simple 0.06;
 use Getopt::Long;
 ####################################################################
@@ -17,7 +17,7 @@ my $donutEffect = 0.3;
 ####################################################################
 
 if (defined($help)) {
-	#system "echo /home/people/pfh/scripts/roseplot/roseplot.help";
+	#system "echo /home/people/xtof/scripts/roseplot/roseplot.help";
 	die("\n");
 }
 
