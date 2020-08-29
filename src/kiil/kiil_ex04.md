@@ -95,7 +95,7 @@ The second part of todays exercise is about predicting two-component systems.
 ```
 foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
    foreach type (RRreciever HisKA_1 HisKA_2 HisKA_3 HWE_HK)
-     /usr/cbs/tools/lib/make/bin/hmmsearch.Linux --cut_tc /usr/cbs/tools/lib/make/pfh/TCS/$type.hmm \
+     /usr/cbs/tools/lib/make/bin/hmmsearch.Linux --cut_tc /usr/cbs/tools/lib/make/xtof/TCS/$type.hmm \
        ../Ex3/source/$accession.proteins.fsa > source/$accession.$type.TCS.hmmsearch &
    end
 end
