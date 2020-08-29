@@ -100,7 +100,7 @@
 #          1. First, you will need to generate a summary file containing the counts of the codons
 # 
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-                perl /home/people/pfh/scripts/codon-usage/codon-usage.pl < source/$accession.orfs.fsa > source/$accession.codon-usage.triplets.list
+                perl /home/people/xtof/scripts/codon-usage/codon-usage.pl < source/$accession.orfs.fsa > source/$accession.codon-usage.triplets.list
              end
 # 
 #          2. Try and view the file you just made:
@@ -113,7 +113,7 @@
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
                 set title = `mysql -B -N -e "select organism from cmp_genomics.genomes where user=USER() and accession='$accession'"`
                 cat source/$accession.codon-usage.triplets.list  | \
-                /home/people/pfh/scripts/roseplot/roseplot.pl -axistitle "Frequency" -fcolor red -steps 4 -T "Codon Usage" -ST "$title" -output $accession.codon-usage.triplets.ps
+                /home/people/xtof/scripts/roseplot/roseplot.pl -axistitle "Frequency" -fcolor red -steps 4 -T "Codon Usage" -ST "$title" -output $accession.codon-usage.triplets.ps
              end
 # 
 #             Try and examine the rose plots by using 'ghostview'. For doing this - AND ONLY THIS - it is recommended to start a new seperate SSH session and INSTEAD OF LOGGING IN TO 'IBIOLOGY', LOG IN TO 'ORGANISM'! Go to the Exercise directory and type 'ghostview <FILENAME>'. Once you see the roseplot, please press CTRL-R to redraw the figure if it does not show up correctly. You will have to use the command 'ls' to see which files have been generated. Can you see differences?
@@ -136,7 +136,7 @@
 #          1. Generate fasta file of all triplets
 # 
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-             cat source/$accession.orfs.fsa | /home/people/pfh/scripts/codon-usage/logo.pl > source/$accession.codon-usage.logo.fsa &
+             cat source/$accession.orfs.fsa | /home/people/xtof/scripts/codon-usage/logo.pl > source/$accession.codon-usage.logo.fsa &
              end
              wait
 # 
@@ -153,7 +153,7 @@
 #          1. First, you will need to generate a summary file containing the counts of the individual aminoacids
 # 
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-                perl /home/people/pfh/scripts/codon-usage/aausage2.pl < source/$accession.proteins.fsa > source/$accession.codon-usage.aa.list
+                perl /home/people/xtof/scripts/codon-usage/aausage2.pl < source/$accession.proteins.fsa > source/$accession.codon-usage.aa.list
              end
 # 
 #          2. Try and view the file you just made:
@@ -166,7 +166,7 @@
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
                 set title = `mysql -B -N -e "select organism from cmp_genomics.genomes where user=USER() and accession='$accession'"`
                 cat source/$accession.codon-usage.aa.list | \
-                /home/people/pfh/scripts/roseplot/roseplot.pl -labelFontSize 15  -axistitle "Frequency" -fcolor blue -Xcol 2 -Ycol 4 -steps 1 -T "Amino Acid Usage" -ST "$title" -output $accession.codon-usage.aa.ps
+                /home/people/xtof/scripts/roseplot/roseplot.pl -labelFontSize 15  -axistitle "Frequency" -fcolor blue -Xcol 2 -Ycol 4 -steps 1 -T "Amino Acid Usage" -ST "$title" -output $accession.codon-usage.aa.ps
              end
 # 
 #             You can view the PostScript by using 'ghostview' just like you did before 
@@ -196,7 +196,7 @@
 #             the genes predicted and the columns correspond to the position relative to translation start.
 # 
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
-             /home/people/pfh/scripts/profile/profile.pl -E "rRNA,tRNA,CDS" -ann source/$accession.ann -min 400 -max 400 -datafile source/$accession.ATcontentBits\
+             /home/people/xtof/scripts/profile/profile.pl -E "rRNA,tRNA,CDS" -ann source/$accession.ann -min 400 -max 400 -datafile source/$accession.ATcontentBits\
                 > source/$accession.ATcontentBits.400profile400.data &
              end
              wait
@@ -211,7 +211,7 @@
              wait
              foreach accession (AE017042 AE016879 AL111168 AL645882 AP008232 AP009048 BA000021 CP000034)
              cat source/$accession.ATcontentBits.400profile400.data \
-                | /home/people/pfh/scripts/profile/profile.avg.pl `gawk '{print $1}' < source/$accession.ATcontentBits.stddev` `gawk '{print $2}' < source/$accession.ATcontentBits.stddev` \
+                | /home/people/xtof/scripts/profile/profile.avg.pl `gawk '{print $1}' < source/$accession.ATcontentBits.stddev` `gawk '{print $2}' < source/$accession.ATcontentBits.stddev` \
                 > source/$accession.ATcontentBits.400profile400.poszscores &
              end
              wait
